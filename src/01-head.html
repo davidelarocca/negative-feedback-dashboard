@@ -1,0 +1,325 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Broken Loop — Feedback Decision Console</title>
+<style>
+/* ══════════════════════════════════════════════════════════════════════════
+   POPPINS — Costa brand typeface, embedded as subset WOFF2 data URIs.
+   Latin + Latin-Ext, SIL Open Font Licence 1.1 (see assets/fonts/OFL.txt).
+   Embedded so the console stays a single file that works with no network.
+   ══════════════════════════════════════════════════════════════════════════ */
+/*__FONTS__*/
+
+/* ══════════════════════════════════════════════════════════════════════════
+   1. DESIGN TOKENS — Costa Crociere brand palette
+   Primary:   blue #0071A3 (Pantone 7690 C) · yellow #F9B000 (Pantone 143 C)
+   Secondary: the tints and shades of the brand grid, used for the instrument
+              panel. No colour outside the brand palette appears in this file.
+   ══════════════════════════════════════════════════════════════════════════ */
+:root{
+  /* — brand primaries — */
+  --costa-blue:      #0071A3;
+  --costa-yellow:    #F9B000;
+
+  /* — brand secondary palette — */
+  --c-blue-light:    #008ABA;
+  --c-blue-mid:      #005982;
+  --c-blue-deep:     #00324A;
+  --c-teal:          #1C414C;
+  --c-teal-mid:      #295B6B;
+  --c-slate:         #588D9C;
+  --c-sky:           #8DAAC9;
+  --c-amber-light:   #FED061;
+  --c-amber-mid:     #EC9700;
+  --c-amber-dark:    #C77706;
+  --c-bone:          #EBE9E8;
+  --c-grey:          #B0B2B3;
+  --c-grey-mid:      #85888C;
+
+  /* — semantic — */
+  --ground:          var(--c-blue-deep);
+  --panel:           rgba(0, 89, 130, .26);
+  --panel-raised:    rgba(0, 89, 130, .40);
+  --line:            rgba(141, 170, 201, .20);
+  --line-strong:     rgba(141, 170, 201, .42);
+  --text:            var(--c-bone);
+  --muted:           var(--c-sky);
+  --accent:          var(--costa-yellow);
+
+  /* Gauge movement. Deliberately NOT green/red: gain is the brand yellow,
+     loss is the brand's dark amber. The instruments measure; they do not
+     award or condemn. */
+  --gain:            var(--costa-yellow);
+  --loss:            var(--c-amber-dark);
+  --flat:            var(--c-slate);
+
+  /* — type — */
+  --sans: 'Poppins', 'Century Gothic', 'Avenir Next', 'Segoe UI', system-ui, -apple-system, sans-serif;
+
+  /* Instrument read-outs use Poppins with tabular figures so numbers hold
+     their column, keeping the brand face everywhere rather than importing a
+     monospace that is not part of the Costa system. */
+  --num-feat: "tnum" 1, "lnum" 1;
+
+  --ease-settle: cubic-bezier(.22, 1, .36, 1);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   2. RESET & SHELL
+   ══════════════════════════════════════════════════════════════════════════ */
+*,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+
+html{
+  /* 1920 fullscreen is the design target: root lands at 16px there.
+     Clamped so a 1366 laptop still holds body copy above 18px. */
+  font-size: clamp(14px, .833vw, 17px);
+  height:100%;
+}
+
+body{
+  height:100%;
+  overflow:hidden;
+  background:
+    radial-gradient(120% 90% at 50% -20%, rgba(0,113,163,.30), transparent 60%),
+    radial-gradient(80% 60% at 50% 120%, rgba(0,0,0,.42), transparent 70%),
+    var(--ground);
+  color:var(--text);
+  font-family:var(--sans);
+  font-weight:400;
+  -webkit-font-smoothing:antialiased;
+  text-rendering:optimizeLegibility;
+}
+
+.num{ font-variant-numeric:tabular-nums lining-nums; font-feature-settings:var(--num-feat); }
+
+/* Visible keyboard focus — required, and styled as part of the panel. */
+:focus-visible{
+  outline:2px solid var(--accent);
+  outline-offset:3px;
+  border-radius:2px;
+}
+:focus:not(:focus-visible){ outline:none; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   3. BRAND TYPOGRAPHIC RULES (from the Costa guideline)
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* — YELLOW DOT —
+   "A yellow dot is used at the end of a sentence... 20% bigger than the text
+   size." Rendered as a true circle scaled off the type size, matching a
+   Poppins full stop set 20% larger. Minimum text size for the yellow dot is
+   20pt; below that the dot takes the text colour (.dot--small). */
+.dot{
+  display:inline-block;
+  width:.23em; height:.23em;
+  border-radius:50%;
+  background:var(--accent);
+  vertical-align:baseline;
+  margin-left:.05em;
+}
+.dot--small{ background:currentColor; }
+
+/* — YELLOW LINE —
+   "It begins at the end of the title and extends to the right, justifying
+   with the corresponding body text. Its height is the same as the font
+   type's underscore." One type space separates text from the line. */
+.ruled{ display:flex; align-items:baseline; gap:.3em; width:100%; }
+.ruled > .ruled__text{ flex:0 1 auto; }
+.ruled > .ruled__line{
+  flex:1 1 auto;
+  height:.085em;              /* Poppins underscore height */
+  min-width:2em;
+  background:var(--accent);
+  transform:translateY(-.06em);
+}
+
+/* — YELLOW LINE, VERTICAL —
+   "The yellow line can be used, in the same proportions indicated above,
+   even vertically, to be placed beside titles and body texts." */
+.vruled{ padding-left:.55em; border-left:.085em solid var(--accent); }
+
+/* — TITLE CONSTRUCTION —
+   The guideline pairs a light first line over a bold second line. */
+.title-stack{ line-height:.98; letter-spacing:-.015em; }
+.title-stack .t1{ display:block; font-weight:300; }
+.title-stack .t2{ display:block; font-weight:700; }
+
+/* — BODY COPY — justified, per the guideline layouts. */
+.body-copy{ text-align:justify; hyphens:auto; }
+
+/* — EYEBROW — small bold caps, the guideline's section marker. */
+.eyebrow{
+  font-size:1.125rem;          /* 18px at target */
+  font-weight:600;
+  letter-spacing:.14em;
+  text-transform:uppercase;
+  color:var(--muted);
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   4. LAYOUT
+   ══════════════════════════════════════════════════════════════════════════ */
+.app{
+  height:100%;
+  display:grid;
+  grid-template-rows:auto minmax(0,1fr);
+}
+
+/* — top bar — */
+.topbar{
+  display:flex; align-items:flex-start; justify-content:space-between;
+  gap:2rem;
+  padding:1.6rem 2.4rem 1.2rem;
+  border-bottom:1px solid var(--line);
+}
+
+/* Brand lockup, built to the guideline's own masthead pattern:
+   small bold caps, stacked, terminated by the yellow dot. */
+.lockup{ display:flex; align-items:center; gap:1rem; }
+.lockup__mark{ display:block; height:2.6rem; width:auto; flex:0 0 auto; }
+/* 1.125rem = 18px at the 1920 target: the floor for anything on screen. */
+.lockup__text{
+  font-size:1.125rem; font-weight:700; line-height:1.3;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--c-grey);
+}
+.lockup__text .lead{ color:var(--muted); font-weight:600; }
+
+/* — presenter strip — an instrument read-out, not a control overlay — */
+.presenter{
+  display:flex; align-items:stretch; gap:0;
+  border:1px solid var(--line);
+  background:var(--panel);
+  border-radius:3px;
+  overflow:hidden;
+}
+.presenter__cell{ padding:.5rem 1.1rem; display:flex; flex-direction:column; gap:.15rem; }
+.presenter__cell + .presenter__cell{ border-left:1px solid var(--line); }
+.presenter__k{
+  font-size:1.125rem; font-weight:600; letter-spacing:.12em;
+  text-transform:uppercase; color:var(--c-slate); line-height:1;
+}
+.presenter__v{ font-size:1.25rem; font-weight:600; color:var(--text); line-height:1.2; }
+.presenter__v .sep{ color:var(--c-slate); font-weight:300; margin:0 .15em; }
+.presenter__v .of{ color:var(--c-slate); font-weight:400; }
+
+/* — main split: stage + instrument rail — */
+.main{
+  display:grid;
+  grid-template-columns:minmax(0,1fr) 25rem;
+  min-height:0;
+}
+.stage{
+  min-height:0; min-width:0;
+  padding:2.2rem 2.6rem 2rem;
+  display:flex; flex-direction:column;
+  overflow:hidden;
+}
+.rail{
+  border-left:1px solid var(--line);
+  background:linear-gradient(180deg, rgba(0,89,130,.20), rgba(0,0,0,.16));
+  padding:1.4rem 1.5rem 1rem;
+  display:flex; flex-direction:column; gap:.9rem;
+  min-height:0;
+}
+.rail__scroll{
+  flex:1 1 auto; min-height:0; overflow-y:auto; overflow-x:hidden;
+  display:flex; flex-direction:column; gap:.9rem;
+}
+.rail__scroll::-webkit-scrollbar{ width:6px; }
+.rail__scroll::-webkit-scrollbar-thumb{ background:var(--c-teal-mid); border-radius:3px; }
+.rail__foot{ flex:0 0 auto; display:flex; flex-direction:column; gap:.7rem; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   5. INSTRUMENT RAIL
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* — loop integrity, the composite read-out — */
+.integrity{
+  border:1px solid var(--line-strong);
+  background:var(--panel-raised);
+  border-radius:3px;
+  padding:.9rem 1.1rem 1rem;
+  text-align:center;
+  flex:0 0 auto;
+}
+.integrity__k{
+  font-size:1.125rem; font-weight:600; letter-spacing:.15em;
+  text-transform:uppercase; color:var(--muted);
+}
+.integrity__v{
+  font-size:4.1rem; font-weight:300; line-height:1; letter-spacing:-.02em;
+  color:var(--text); margin-top:.2rem;
+}
+.integrity__v .pct{ font-size:.42em; font-weight:600; color:var(--accent); margin-left:.1em; vertical-align:.55em; }
+.integrity__bar{ height:.2rem; background:rgba(0,0,0,.35); margin-top:.7rem; overflow:hidden; }
+.integrity__fill{ height:100%; width:0; background:var(--accent); transition:width .5s var(--ease-settle); }
+
+/* — the three gauges — */
+.gauges{ display:flex; flex-direction:column; gap:.7rem; flex:0 0 auto; }
+.gauge{
+  border:1px solid var(--line);
+  background:var(--panel);
+  border-radius:3px;
+  padding:.6rem .9rem .4rem;
+}
+.gauge__head{ display:flex; align-items:baseline; justify-content:space-between; gap:.5rem; }
+.gauge__name{
+  font-size:1.125rem; font-weight:600; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--muted);
+}
+.gauge__val{ font-size:1.5rem; font-weight:600; line-height:1; color:var(--text); }
+.gauge__svg{ display:block; width:100%; height:auto; margin-top:.1rem; }
+.gauge__note{
+  font-size:1.125rem; font-weight:400; color:var(--c-slate);
+  text-align:center; line-height:1.3; margin-top:-.15rem;
+}
+
+/* gauge internals */
+.g-track{ fill:none; stroke:rgba(0,0,0,.40); stroke-width:9; stroke-linecap:round; }
+/* Round cap so a small deflection reads as a deliberate marker rather than
+   a stray block of colour. */
+.g-active{ fill:none; stroke:var(--accent); stroke-width:9; stroke-linecap:round; opacity:.92; }
+.g-active.is-loss{ stroke:var(--loss); }
+.g-tick{ stroke:var(--line-strong); stroke-width:1.5; }
+.g-tick--major{ stroke:var(--c-slate); stroke-width:2.5; }
+.g-needle{ stroke:var(--c-bone); stroke-width:3.5; stroke-linecap:round; }
+.g-needle-tip{ stroke:var(--accent); stroke-width:3.5; stroke-linecap:round; }
+.g-hub{ fill:var(--c-bone); }
+.g-hub-in{ fill:var(--ground); }
+.g-zero{ stroke:var(--c-sky); stroke-width:2; opacity:.55; }
+
+/* — minutes spent: the fourth and most important variable — */
+.timecost{
+  border:1px solid var(--accent);
+  background:linear-gradient(180deg, rgba(249,176,0,.13), rgba(249,176,0,.05));
+  border-radius:3px;
+  padding:.8rem 1.1rem .9rem;
+  flex:0 0 auto;
+}
+.timecost__k{
+  font-size:1.125rem; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--c-amber-light);
+}
+.timecost__row{ display:flex; align-items:baseline; gap:.4rem; margin-top:.1rem; }
+.timecost__v{ font-size:2.9rem; font-weight:300; line-height:1; color:var(--text); letter-spacing:-.02em; }
+.timecost__u{ font-size:1.125rem; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--c-amber-light); }
+
+/* — reset: the one visible control — */
+.reset{
+  flex:0 0 auto;
+  display:flex; align-items:center; justify-content:center; gap:.5rem;
+  font-family:inherit; font-size:1.125rem; font-weight:600;
+  letter-spacing:.12em; text-transform:uppercase;
+  color:var(--c-slate); background:transparent;
+  border:1px solid var(--line); border-radius:3px;
+  padding:.5rem; cursor:pointer;
+  transition:color .18s, border-color .18s;
+}
+.reset:hover{ color:var(--text); border-color:var(--line-strong); }
+.reset kbd{
+  font-family:inherit; font-size:1em; font-weight:700;
+  color:var(--ground); background:var(--c-slate);
+  border-radius:2px; padding:.05em .45em; letter-spacing:.02em;
+}
