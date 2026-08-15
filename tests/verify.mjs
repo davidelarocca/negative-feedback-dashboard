@@ -20,7 +20,10 @@ const DASH = 'file://' + path.join(ROOT, 'broken-loop.html');
 const DECK = 'file://' + path.join(ROOT, 'broken-loop-deck.html');
 const SESSION = 'file://' + path.join(ROOT, 'broken-loop-session.html');
 
-const SIZES = [[1920, 1080], [1600, 900], [1440, 900], [1366, 768], [1280, 800]];
+/* Real presentation windows, down to the smallest worth supporting. */
+const SIZES = [[1920, 1080], [1680, 1050], [1536, 864], [1470, 956], [1440, 900],
+               [1366, 768], [1280, 800], [1280, 720], [1194, 834], [1152, 720],
+               [1100, 800], [1024, 768], [1024, 640]];
 
 let passed = 0;
 const failures = [];
@@ -69,6 +72,15 @@ console.log('\nDASHBOARD');
   check('Poppins is the only typeface', meta.fonts.length === 1 && meta.fonts[0] === 'Poppins', meta.fonts.join(','));
   check('Costa mark is embedded and decodes', meta.logo);
 
+  /* Only one screen may render. A class re-declaring display:flex beats
+     .screen{display:none} on source order, which left the summary's panels
+     showing underneath every other screen. */
+  const onlyOne = async () => p.evaluate(() =>
+    ['title','case','conseq','summary']
+      .filter(v => getComputedStyle(document.getElementById('screen-' + v)).display !== 'none')
+      .join(','));
+  check('only the active screen renders (title)', await onlyOne() === 'title', await onlyOne());
+
   /* a full round, then back out of it again */
   await press(p, 'ArrowRight');
   await press(p, '1', 900);
@@ -76,6 +88,7 @@ console.log('\nDASHBOARD');
   await press(p, 'ArrowLeft', 900);
   const undone = await p.evaluate(() => document.getElementById('r-minutes').textContent);
   check('back undoes a recorded decision', undone === '0', `after=${after} undone=${undone}`);
+  check('only the active screen renders (case)', await onlyOne() === 'case', await onlyOne());
 
   await press(p, '1', 900);
   for (let i = 0; i < 7; i++) { await press(p, 'ArrowRight'); await press(p, '1', 900); }
@@ -94,6 +107,7 @@ console.log('\nDASHBOARD');
   check('four diagnostic dimensions', sum.diag === 4);
   check('a tailored reading is generated', sum.readout > 120, `${sum.readout} chars`);
   check('fastest path over eight cases is 17 minutes', sum.fast === '17', sum.fast);
+  check('only the active screen renders (summary)', await onlyOne() === 'summary', await onlyOne());
 
   /* reset asks twice mid-session */
   await press(p, 'r');
@@ -135,6 +149,18 @@ for (const [w, h] of SIZES) {
   const notes = await p.evaluate(() =>
     [...document.querySelectorAll('.gauge__note')].every(n => getComputedStyle(n).display !== 'none'));
 
+  const caseEsc = await p.evaluate(() => {
+    const st = document.querySelector('.stage'), cs = getComputedStyle(st), r = st.getBoundingClientRect();
+    const bottom = r.bottom - parseFloat(cs.paddingBottom);
+    const out = [];
+    st.querySelectorAll('*').forEach(n => {
+      const q = n.getBoundingClientRect();
+      if (!q.height || !(n.textContent || '').trim()) return;
+      if (q.bottom > bottom + 2) out.push((n.textContent || '').trim().replace(/\s+/g, ' ').slice(0, 20));
+    });
+    return [...new Set(out)];
+  });
+
   for (let i = 0; i < 8; i++) { await press(p, '1', 90); await press(p, 'ArrowRight', 90); }
   await p.waitForTimeout(450);
 
@@ -159,8 +185,14 @@ for (const [w, h] of SIZES) {
     };
   });
   check(`${w}x${h} rail fits and keeps its captions`, railFits && notes);
+  /* At 1180 and below the rail moves to a strip under the stage and the
+     layout is explicitly a fallback: it may scroll rather than clip. Above
+     that, nothing may leave the stage. */
+  if (w > 1180) check(`${w}x${h} case screen stays inside the stage`, caseEsc.length === 0, caseEsc.join(' / '));
   check(`${w}x${h} summary fits with nothing escaping`, !fit.scrolls && !fit.page && fit.escapes.length === 0,
     fit.escapes.join(' / '));
+  if (w <= 1180) check(`${w}x${h} fallback layout still scrolls rather than clips`,
+    await p.evaluate(() => getComputedStyle(document.querySelector('.stage')).overflowY === 'auto'));
   await p.close();
 }
 
@@ -337,8 +369,10 @@ console.log('\nONE FILE');
     await p.waitForTimeout(220);
     await frame.evaluate(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: '1', bubbles: true })));
     await p.waitForTimeout(950);
-    const mins = await frame.evaluate(() => document.getElementById('r-minutes').textContent);
-    check('decisions record inside the embedded dashboard', mins !== '0', mins);
+    /* Options are shuffled and some cost zero minutes, so the minutes
+       read-out is not a reliable signal that a decision landed. The screen is. */
+    const view = await frame.evaluate(() => document.querySelector('.screen.is-active').id);
+    check('decisions record inside the embedded dashboard', view === 'screen-conseq', view);
 
     await frame.evaluate(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
     await p.waitForTimeout(550);

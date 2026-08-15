@@ -28,6 +28,19 @@ const state = {
   resetTimer:null
 };
 
+/* ── presentation bridge ───────────────────────────────────────────────────
+   When the dashboard is embedded in the deck it announces itself, so the deck
+   knows the frame is live, and hands control back on Escape or on advancing
+   past the summary. Local-file frames are cross-origin, which is why this
+   goes over postMessage. Standalone, EMBEDDED is false and none of it does
+   anything — including the visible control, which stays hidden. */
+const EMBEDDED = (() => { try { return window.parent !== window; } catch (e) { return true; } })();
+
+function tellDeck(type){
+  if (!EMBEDDED) return;
+  try { window.parent.postMessage({ type }, '*'); } catch (e) {}
+}
+
 /* current needle positions, so animation always starts where the eye is */
 const shown = { trust:0, signal:0, standard:0, integrity:0 };
 
@@ -223,6 +236,14 @@ function show(view){
   /* On the summary the instruments move to centre stage, so the rail steps
      aside and the whole screen fits with nothing to scroll. */
   document.querySelector('.main').classList.toggle('no-rail', view === 'summary');
+
+  /* The way back to the deck is only ever offered when there is a deck to go
+     back to, and it becomes the obvious next move once the round is over. */
+  const back = $('r-back');
+  back.hidden = !EMBEDDED;
+  back.classList.toggle('is-cta', view === 'summary');
+  $('r-back-t').textContent = view === 'summary'
+    ? 'Continue the presentation' : 'Back to the presentation';
   syncPresenter();
   syncNotes();
 }
@@ -489,11 +510,15 @@ function fitReadout(){
   const box = el.closest('.panel');
   if (!el || !box) return;
   el.style.fontSize = '';
+  el.style.lineHeight = '';
   let size = parseFloat(getComputedStyle(el).fontSize);
   let guard = 0;
-  while (box.scrollHeight > box.clientHeight + 1 && size > 12 && guard++ < 24){
+  while (box.scrollHeight > box.clientHeight + 1 && size > 11 && guard++ < 30){
     size -= 0.5;
     el.style.fontSize = size + 'px';
+    /* Tighten the leading alongside the size — on a small panel the gaps
+       between lines cost as much as the letters do. */
+    if (size < 15) el.style.lineHeight = '1.3';
   }
 }
 window.addEventListener('resize', () => { if (state.view === 'summary') fitReadout(); });
@@ -571,6 +596,9 @@ function advance(){
   startClock();
   if (state.view === 'title')  { renderCase(0); return; }
   if (state.view === 'conseq') { nextFrom(state.idx); return; }
+  /* The round is over: advancing again continues the session rather than
+     doing nothing, so the presenter never has to know a key to get out. */
+  if (state.view === 'summary' && EMBEDDED){ tellDeck('broken-loop:return'); return; }
   /* on a case screen a decision is required — S skips it deliberately */
 }
 
@@ -639,18 +667,6 @@ function doReset(){
   moveInstruments(false);
 }
 
-/* ── presentation bridge ───────────────────────────────────────────────────
-   When the console is embedded in the deck it announces itself, so the deck
-   knows the frame is live, and hands control back on Escape. Local-file
-   frames are cross-origin, which is why this goes over postMessage. Running
-   standalone, EMBEDDED is false and none of this does anything. */
-const EMBEDDED = (() => { try { return window.parent !== window; } catch (e) { return true; } })();
-
-function tellDeck(type){
-  if (!EMBEDDED) return;
-  try { window.parent.postMessage({ type }, '*'); } catch (e) {}
-}
-
 /* ── input ─────────────────────────────────────────────────────────────── */
 const NAV_KEYS = [' ', 'Spacebar', 'ArrowRight', 'ArrowLeft', 'PageDown', 'PageUp'];
 
@@ -681,6 +697,7 @@ $('c-options').addEventListener('click', e => {
 });
 
 $('r-reset').addEventListener('click', armReset);
+$('r-back').addEventListener('click', () => tellDeck('broken-loop:return'));
 
 /* ── boot ──────────────────────────────────────────────────────────────── */
 function buildLegend(){

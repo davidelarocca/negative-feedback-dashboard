@@ -213,6 +213,34 @@ body{
 }
 .lockup__text .lead{ color:var(--muted); font-weight:600; }
 
+/* — back to the deck —
+   Shown only when the dashboard is running inside the presentation. It lives
+   in the top bar rather than the rail, because the rail steps aside on the
+   summary, which is exactly where the presenter needs it. */
+.backdeck{
+  display:flex; align-items:center; gap:.55rem;
+  font-family:inherit; font-size:1.125rem; font-weight:600;
+  letter-spacing:.1em; text-transform:uppercase;
+  color:var(--muted); background:transparent;
+  border:1px solid var(--line-strong); border-radius:3px;
+  padding:.5rem .9rem; cursor:pointer; margin-left:auto; margin-right:1rem;
+  transition:color .18s, border-color .18s, background-color .18s;
+}
+.backdeck[hidden]{ display:none; }
+.backdeck svg{ width:1em; height:1em; fill:currentColor; }
+.backdeck kbd{
+  font-family:inherit; font-size:.9em; font-weight:700;
+  color:var(--ground); background:var(--c-slate);
+  border-radius:2px; padding:.1em .45em; letter-spacing:.02em;
+}
+.backdeck:hover{ color:var(--text); border-color:var(--accent); }
+/* On the summary the round is over, so this becomes the obvious next move. */
+.backdeck.is-cta{
+  color:var(--ground); background:var(--accent); border-color:var(--accent);
+}
+.backdeck.is-cta kbd{ background:rgba(0,50,74,.22); color:var(--ground); }
+.backdeck.is-cta:hover{ background:var(--c-amber-light); color:var(--ground); }
+
 /* — presenter strip — an instrument read-out, not a control overlay — */
 .presenter{
   display:flex; align-items:stretch; gap:0;
@@ -494,7 +522,11 @@ body{
    The three instruments are the outcome; time supports it. The rail steps
    aside here so the KPIs get the full width and the whole screen fits with
    nothing to scroll. */
-.summary-screen{ display:flex; flex-direction:column; gap:.7rem; min-height:0; }
+/* No display here: .screen already hides an inactive screen and .is-active
+   shows it. Re-declaring display:flex on this class beats .screen{display:none}
+   on source order, which left the summary's panels rendered underneath every
+   other screen. */
+.summary-screen{ gap:.7rem; min-height:0; }
 
 /* ── the three instruments, full size ── */
 .kpis{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:.7rem; flex:.82 1 0; min-height:0; }
@@ -638,13 +670,77 @@ body{
   .reset{ flex:0 0 auto; padding:.5rem .9rem; }
   /* Below the presentation sizes this is a fallback layout, so the stage may
      scroll rather than clip. */
-  .stage{ overflow-y:auto; }
   .movement{ margin-top:1rem; }
-  .options{ grid-template-columns:minmax(0,1fr); }
+  /* The rail is a strip along the bottom here, so it takes as little of the
+     stage's height as it can. */
+  .gauge__svg{ max-height:3.2rem; }
+  .integrity__v{ font-size:2.1rem; }
+  .timecost__v{ font-size:1.9rem; }
+  /* The summary already hides the rail; the time strip goes too, since
+     minutes are reported in the diagnostics. */
+  .sum-foot{ display:none; }
+  /* Below the presentation sizes this is a fallback layout: the stage may
+     scroll rather than clip a decision the room needs to read. */
+  .stage{ overflow-y:auto; }
+  /* Two up stays shorter than one column, which is what matters here. */
+  .options{ gap:.7rem; }
+  .option{ padding:.75rem .9rem .8rem; }
+  .option__text{ font-size:1.15rem; }
+  .setup{ font-size:1.35rem; }
   .loop{ grid-template-columns:repeat(3, minmax(0,1fr)); }
   .strip{ grid-template-columns:repeat(4, minmax(0,1fr)); }
 }
 /* Laptops around 900px tall: tighten the rail, keep every read-out. */
+/* ── narrow windows ──
+   Below roughly 1240px the summary's columns get too tight: the diagnostics
+   labels wrap, the cells double in height and the text lands on the panel
+   below, which reads as panels overlapping. These rules live at the end of
+   the file because a media query adds no specificity — placed earlier they
+   lose to the base rules they are meant to override. */
+@media (max-width:1240px){
+  .kpis{ flex:0 0 auto; }
+  .kpi{ padding:.6rem .85rem .7rem; }
+  .kpi__svg{ display:none; }          /* the dials are live on the rail; here the number carries it */
+  .kpi__v{ font-size:2.1rem; }
+  .sum-mid{ grid-template-columns:1.45fr 1fr 1fr; gap:.55rem; }
+  .panel{ padding:.6rem .85rem .7rem; }
+  .diag{ grid-template-columns:minmax(0,1fr); gap:.3rem; }
+  .diag__c{ flex-direction:row; align-items:baseline; justify-content:space-between; gap:.6rem; }
+  .diag__v{ font-size:1.3rem; white-space:nowrap; }
+  .diag__k{ white-space:nowrap; }
+  .brk__k{ flex-basis:8.4rem; }
+  .profile__name{ font-size:1.6rem; }
+  .timerow{ gap:.9rem; }
+  .timerow__n{ font-size:1.8rem; }
+  /* The sentence spelling out the fastest path is the bulkiest thing in the
+     foot. Minutes and the benchmark stay in the diagnostics, so dropping it
+     here costs the gloss, not the comparison. */
+  .timerow__d{ display:none; }
+  .strip{ gap:.25rem; }
+  .strip__c{ padding:.3rem .35rem .35rem; }
+  .strip__pips{ height:.8rem; }
+}
+
+/* Narrower still: the per-case strip is the first thing that can go, and the
+   reading keeps the width it needs to stay readable. */
+@media (max-width:1100px){
+  .sum-foot{ grid-template-columns:minmax(0,1fr); }
+  .sum-foot > .panel:last-child{ display:none; }   /* the per-case strip */
+  .brk__k{ flex-basis:8rem; }
+  .kpi__d{ font-size:1rem; }
+  /* Label and value stop competing for one line: each gets the full width
+     of the column, which is what keeps the detail from running out of the
+     panel and onto the one below. */
+  .diag__c{ flex-direction:column; align-items:flex-start; gap:.02rem; }
+  .diag__v{ font-size:1.25rem; }
+}
+
+/* A short window has no room for the supporting time strip at all. Minutes
+   and the benchmark are already reported in the diagnostics. */
+@media (max-height:700px), (max-width:1040px){
+  .sum-foot{ display:none; }
+}
+
 @media (max-height:960px){
   .rail{ padding:1rem 1.2rem .9rem; gap:.7rem; }
   .rail__scroll{ gap:.7rem; }
@@ -652,8 +748,19 @@ body{
   .integrity__v{ font-size:3.4rem; }
   .gauges{ gap:.6rem; }
   .gauge{ padding:.5rem .8rem .35rem; }
+  .gauge__svg{ max-height:5.2rem; }
   .timecost{ padding:.65rem 1rem .7rem; }
   .timecost__v{ font-size:2.5rem; }
+}
+
+/* Short windows: the stage trims before anything is allowed to run past it. */
+@media (max-height:880px){
+  .setup{ font-size:1.5rem; }
+  .option{ padding:.9rem 1.1rem .95rem; }
+  .option__text{ font-size:1.22rem; }
+  .options{ gap:.8rem; }
+  .conseq-text{ font-size:1.45rem; }
+  .loop__pt{ padding:.55rem .7rem .6rem; }
 }
 
 @media (max-height:820px){
@@ -698,6 +805,10 @@ body{
 </head>
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M4 11h12.2l-4.6-4.6L13 5l7 7-7 7-1.4-1.4 4.6-4.6H4z"/></symbol>
+</svg>
+
 <!-- Arrow glyphs are drawn, not typed: the Poppins subset carries no U+2192. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <symbol id="i-right" viewBox="0 0 24 24">
@@ -725,6 +836,12 @@ body{
         <div class="lead">Feedback Management Dashboard<span class="dot dot--small"></span></div>
       </div>
     </div>
+
+    <button class="backdeck" id="r-back" type="button" hidden>
+      <span id="r-back-t">Back to the presentation</span>
+      <svg aria-hidden="true"><use href="#i-right"/></svg>
+      <kbd>Esc</kbd>
+    </button>
 
     <div class="presenter" role="status" aria-live="off">
       <div class="presenter__cell">
@@ -1163,6 +1280,19 @@ const state = {
   resetTimer:null
 };
 
+/* ── presentation bridge ───────────────────────────────────────────────────
+   When the dashboard is embedded in the deck it announces itself, so the deck
+   knows the frame is live, and hands control back on Escape or on advancing
+   past the summary. Local-file frames are cross-origin, which is why this
+   goes over postMessage. Standalone, EMBEDDED is false and none of it does
+   anything — including the visible control, which stays hidden. */
+const EMBEDDED = (() => { try { return window.parent !== window; } catch (e) { return true; } })();
+
+function tellDeck(type){
+  if (!EMBEDDED) return;
+  try { window.parent.postMessage({ type }, '*'); } catch (e) {}
+}
+
 /* current needle positions, so animation always starts where the eye is */
 const shown = { trust:0, signal:0, standard:0, integrity:0 };
 
@@ -1358,6 +1488,14 @@ function show(view){
   /* On the summary the instruments move to centre stage, so the rail steps
      aside and the whole screen fits with nothing to scroll. */
   document.querySelector('.main').classList.toggle('no-rail', view === 'summary');
+
+  /* The way back to the deck is only ever offered when there is a deck to go
+     back to, and it becomes the obvious next move once the round is over. */
+  const back = $('r-back');
+  back.hidden = !EMBEDDED;
+  back.classList.toggle('is-cta', view === 'summary');
+  $('r-back-t').textContent = view === 'summary'
+    ? 'Continue the presentation' : 'Back to the presentation';
   syncPresenter();
   syncNotes();
 }
@@ -1624,11 +1762,15 @@ function fitReadout(){
   const box = el.closest('.panel');
   if (!el || !box) return;
   el.style.fontSize = '';
+  el.style.lineHeight = '';
   let size = parseFloat(getComputedStyle(el).fontSize);
   let guard = 0;
-  while (box.scrollHeight > box.clientHeight + 1 && size > 12 && guard++ < 24){
+  while (box.scrollHeight > box.clientHeight + 1 && size > 11 && guard++ < 30){
     size -= 0.5;
     el.style.fontSize = size + 'px';
+    /* Tighten the leading alongside the size — on a small panel the gaps
+       between lines cost as much as the letters do. */
+    if (size < 15) el.style.lineHeight = '1.3';
   }
 }
 window.addEventListener('resize', () => { if (state.view === 'summary') fitReadout(); });
@@ -1706,6 +1848,9 @@ function advance(){
   startClock();
   if (state.view === 'title')  { renderCase(0); return; }
   if (state.view === 'conseq') { nextFrom(state.idx); return; }
+  /* The round is over: advancing again continues the session rather than
+     doing nothing, so the presenter never has to know a key to get out. */
+  if (state.view === 'summary' && EMBEDDED){ tellDeck('broken-loop:return'); return; }
   /* on a case screen a decision is required — S skips it deliberately */
 }
 
@@ -1774,18 +1919,6 @@ function doReset(){
   moveInstruments(false);
 }
 
-/* ── presentation bridge ───────────────────────────────────────────────────
-   When the console is embedded in the deck it announces itself, so the deck
-   knows the frame is live, and hands control back on Escape. Local-file
-   frames are cross-origin, which is why this goes over postMessage. Running
-   standalone, EMBEDDED is false and none of this does anything. */
-const EMBEDDED = (() => { try { return window.parent !== window; } catch (e) { return true; } })();
-
-function tellDeck(type){
-  if (!EMBEDDED) return;
-  try { window.parent.postMessage({ type }, '*'); } catch (e) {}
-}
-
 /* ── input ─────────────────────────────────────────────────────────────── */
 const NAV_KEYS = [' ', 'Spacebar', 'ArrowRight', 'ArrowLeft', 'PageDown', 'PageUp'];
 
@@ -1816,6 +1949,7 @@ $('c-options').addEventListener('click', e => {
 });
 
 $('r-reset').addEventListener('click', armReset);
+$('r-back').addEventListener('click', () => tellDeck('broken-loop:return'));
 
 /* ── boot ──────────────────────────────────────────────────────────────── */
 function buildLegend(){

@@ -142,7 +142,11 @@
    The three instruments are the outcome; time supports it. The rail steps
    aside here so the KPIs get the full width and the whole screen fits with
    nothing to scroll. */
-.summary-screen{ display:flex; flex-direction:column; gap:.7rem; min-height:0; }
+/* No display here: .screen already hides an inactive screen and .is-active
+   shows it. Re-declaring display:flex on this class beats .screen{display:none}
+   on source order, which left the summary's panels rendered underneath every
+   other screen. */
+.summary-screen{ gap:.7rem; min-height:0; }
 
 /* ── the three instruments, full size ── */
 .kpis{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:.7rem; flex:.82 1 0; min-height:0; }
@@ -286,13 +290,77 @@
   .reset{ flex:0 0 auto; padding:.5rem .9rem; }
   /* Below the presentation sizes this is a fallback layout, so the stage may
      scroll rather than clip. */
-  .stage{ overflow-y:auto; }
   .movement{ margin-top:1rem; }
-  .options{ grid-template-columns:minmax(0,1fr); }
+  /* The rail is a strip along the bottom here, so it takes as little of the
+     stage's height as it can. */
+  .gauge__svg{ max-height:3.2rem; }
+  .integrity__v{ font-size:2.1rem; }
+  .timecost__v{ font-size:1.9rem; }
+  /* The summary already hides the rail; the time strip goes too, since
+     minutes are reported in the diagnostics. */
+  .sum-foot{ display:none; }
+  /* Below the presentation sizes this is a fallback layout: the stage may
+     scroll rather than clip a decision the room needs to read. */
+  .stage{ overflow-y:auto; }
+  /* Two up stays shorter than one column, which is what matters here. */
+  .options{ gap:.7rem; }
+  .option{ padding:.75rem .9rem .8rem; }
+  .option__text{ font-size:1.15rem; }
+  .setup{ font-size:1.35rem; }
   .loop{ grid-template-columns:repeat(3, minmax(0,1fr)); }
   .strip{ grid-template-columns:repeat(4, minmax(0,1fr)); }
 }
 /* Laptops around 900px tall: tighten the rail, keep every read-out. */
+/* ── narrow windows ──
+   Below roughly 1240px the summary's columns get too tight: the diagnostics
+   labels wrap, the cells double in height and the text lands on the panel
+   below, which reads as panels overlapping. These rules live at the end of
+   the file because a media query adds no specificity — placed earlier they
+   lose to the base rules they are meant to override. */
+@media (max-width:1240px){
+  .kpis{ flex:0 0 auto; }
+  .kpi{ padding:.6rem .85rem .7rem; }
+  .kpi__svg{ display:none; }          /* the dials are live on the rail; here the number carries it */
+  .kpi__v{ font-size:2.1rem; }
+  .sum-mid{ grid-template-columns:1.45fr 1fr 1fr; gap:.55rem; }
+  .panel{ padding:.6rem .85rem .7rem; }
+  .diag{ grid-template-columns:minmax(0,1fr); gap:.3rem; }
+  .diag__c{ flex-direction:row; align-items:baseline; justify-content:space-between; gap:.6rem; }
+  .diag__v{ font-size:1.3rem; white-space:nowrap; }
+  .diag__k{ white-space:nowrap; }
+  .brk__k{ flex-basis:8.4rem; }
+  .profile__name{ font-size:1.6rem; }
+  .timerow{ gap:.9rem; }
+  .timerow__n{ font-size:1.8rem; }
+  /* The sentence spelling out the fastest path is the bulkiest thing in the
+     foot. Minutes and the benchmark stay in the diagnostics, so dropping it
+     here costs the gloss, not the comparison. */
+  .timerow__d{ display:none; }
+  .strip{ gap:.25rem; }
+  .strip__c{ padding:.3rem .35rem .35rem; }
+  .strip__pips{ height:.8rem; }
+}
+
+/* Narrower still: the per-case strip is the first thing that can go, and the
+   reading keeps the width it needs to stay readable. */
+@media (max-width:1100px){
+  .sum-foot{ grid-template-columns:minmax(0,1fr); }
+  .sum-foot > .panel:last-child{ display:none; }   /* the per-case strip */
+  .brk__k{ flex-basis:8rem; }
+  .kpi__d{ font-size:1rem; }
+  /* Label and value stop competing for one line: each gets the full width
+     of the column, which is what keeps the detail from running out of the
+     panel and onto the one below. */
+  .diag__c{ flex-direction:column; align-items:flex-start; gap:.02rem; }
+  .diag__v{ font-size:1.25rem; }
+}
+
+/* A short window has no room for the supporting time strip at all. Minutes
+   and the benchmark are already reported in the diagnostics. */
+@media (max-height:700px), (max-width:1040px){
+  .sum-foot{ display:none; }
+}
+
 @media (max-height:960px){
   .rail{ padding:1rem 1.2rem .9rem; gap:.7rem; }
   .rail__scroll{ gap:.7rem; }
@@ -300,8 +368,19 @@
   .integrity__v{ font-size:3.4rem; }
   .gauges{ gap:.6rem; }
   .gauge{ padding:.5rem .8rem .35rem; }
+  .gauge__svg{ max-height:5.2rem; }
   .timecost{ padding:.65rem 1rem .7rem; }
   .timecost__v{ font-size:2.5rem; }
+}
+
+/* Short windows: the stage trims before anything is allowed to run past it. */
+@media (max-height:880px){
+  .setup{ font-size:1.5rem; }
+  .option{ padding:.9rem 1.1rem .95rem; }
+  .option__text{ font-size:1.22rem; }
+  .options{ gap:.8rem; }
+  .conseq-text{ font-size:1.45rem; }
+  .loop__pt{ padding:.55rem .7rem .6rem; }
 }
 
 @media (max-height:820px){

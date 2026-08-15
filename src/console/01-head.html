@@ -186,6 +186,34 @@ body{
 }
 .lockup__text .lead{ color:var(--muted); font-weight:600; }
 
+/* — back to the deck —
+   Shown only when the dashboard is running inside the presentation. It lives
+   in the top bar rather than the rail, because the rail steps aside on the
+   summary, which is exactly where the presenter needs it. */
+.backdeck{
+  display:flex; align-items:center; gap:.55rem;
+  font-family:inherit; font-size:1.125rem; font-weight:600;
+  letter-spacing:.1em; text-transform:uppercase;
+  color:var(--muted); background:transparent;
+  border:1px solid var(--line-strong); border-radius:3px;
+  padding:.5rem .9rem; cursor:pointer; margin-left:auto; margin-right:1rem;
+  transition:color .18s, border-color .18s, background-color .18s;
+}
+.backdeck[hidden]{ display:none; }
+.backdeck svg{ width:1em; height:1em; fill:currentColor; }
+.backdeck kbd{
+  font-family:inherit; font-size:.9em; font-weight:700;
+  color:var(--ground); background:var(--c-slate);
+  border-radius:2px; padding:.1em .45em; letter-spacing:.02em;
+}
+.backdeck:hover{ color:var(--text); border-color:var(--accent); }
+/* On the summary the round is over, so this becomes the obvious next move. */
+.backdeck.is-cta{
+  color:var(--ground); background:var(--accent); border-color:var(--accent);
+}
+.backdeck.is-cta kbd{ background:rgba(0,50,74,.22); color:var(--ground); }
+.backdeck.is-cta:hover{ background:var(--c-amber-light); color:var(--ground); }
+
 /* — presenter strip — an instrument read-out, not a control overlay — */
 .presenter{
   display:flex; align-items:stretch; gap:0;

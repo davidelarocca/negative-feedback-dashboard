@@ -1,5 +1,9 @@
 <body>
 
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M4 11h12.2l-4.6-4.6L13 5l7 7-7 7-1.4-1.4 4.6-4.6H4z"/></symbol>
+</svg>
+
 <!-- Arrow glyphs are drawn, not typed: the Poppins subset carries no U+2192. -->
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <symbol id="i-right" viewBox="0 0 24 24">
@@ -27,6 +31,12 @@
         <div class="lead">Feedback Management Dashboard<span class="dot dot--small"></span></div>
       </div>
     </div>
+
+    <button class="backdeck" id="r-back" type="button" hidden>
+      <span id="r-back-t">Back to the presentation</span>
+      <svg aria-hidden="true"><use href="#i-right"/></svg>
+      <kbd>Esc</kbd>
+    </button>
 
     <div class="presenter" role="status" aria-live="off">
       <div class="presenter__cell">
