@@ -1,0 +1,82 @@
+<body>
+
+<!-- Arrow glyphs are drawn rather than typed, so the controls panel needs no
+     second typeface for them. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-right" viewBox="0 0 24 24"><path d="M4 11h12.2l-4.6-4.6L13 5l7 7-7 7-1.4-1.4 4.6-4.6H4z"/></symbol>
+  <symbol id="i-left"  viewBox="0 0 24 24"><path d="M20 11H7.8l4.6-4.6L11 5l-7 7 7 7 1.4-1.4L7.8 13H20z"/></symbol>
+</svg>
+
+<div class="viewport">
+  <!-- Fixed 1280×720 design canvas, scaled to whatever screen turns up. -->
+  <div class="canvas" id="canvas">
+
+    <div class="rail" id="rail" aria-hidden="true"></div>
+
+    <div id="slides"></div>
+
+    <!-- Counter and clock only. Every key hint lives behind H, so the shared
+         screen never carries instructions the audience does not need. -->
+    <div class="presenter">
+      <span class="presenter__n"><b id="p-n">01</b><span class="of"> / <span id="p-total">25</span></span></span>
+      <span class="presenter__tick"></span>
+      <span id="p-clock">00:00</span>
+      <span class="presenter__tick"></span>
+      <span class="presenter__h" title="Press H for controls">H</span>
+    </div>
+
+    <div class="notes" id="notes">
+      <div class="notes__k" id="notes-k">Slide 01</div>
+      <div class="notes__b" id="notes-b"></div>
+    </div>
+
+    <!-- H · controls -->
+    <div class="help" id="help" role="dialog" aria-label="Controls">
+      <div class="help__panel">
+        <div class="help__k">Presenter</div>
+        <div class="help__t">Controls</div>
+        <div class="help__rows">
+          <div class="help__r">
+            <span class="help__keys">
+              <kbd><svg aria-hidden="true"><use href="#i-right"/></svg></kbd><kbd>Space</kbd><kbd>Click</kbd>
+            </span>
+            <span class="help__d">Advance one reveal, then one slide</span>
+          </div>
+          <div class="help__r">
+            <span class="help__keys"><kbd><svg aria-hidden="true"><use href="#i-left"/></svg></kbd></span>
+            <span class="help__d">Back one reveal, then one slide</span>
+          </div>
+          <div class="help__r">
+            <span class="help__keys"><kbd>N</kbd></span>
+            <span class="help__d">Speaker notes for the current slide</span>
+          </div>
+          <div class="help__r">
+            <span class="help__keys"><kbd>F</kbd></span>
+            <span class="help__d">Full screen</span>
+          </div>
+          <div class="help__r">
+            <span class="help__keys"><kbd>Esc</kbd></span>
+            <span class="help__d">Return from the dashboard · close this panel</span>
+          </div>
+          <div class="help__r">
+            <span class="help__keys"><kbd>R</kbd></span>
+            <span class="help__d">Reset to the first slide and clear the clock</span>
+          </div>
+          <div class="help__r">
+            <span class="help__keys"><kbd>H</kbd></span>
+            <span class="help__d">This panel</span>
+          </div>
+        </div>
+        <p class="help__foot">The clock starts on your first key press. Slide 20 hands over to the dashboard.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!--
+  The dashboard, preloaded and hidden. Full-bleed at real viewport size rather
+  than inside the scaled canvas, because it carries its own responsive layout.
+  Its background is the colour the deck has already inverted to.
+-->
+<iframe class="console" id="console" title="Feedback Management Dashboard"
+        referrerpolicy="no-referrer"></iframe>

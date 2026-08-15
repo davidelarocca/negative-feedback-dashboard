@@ -1,0 +1,171 @@
+<body>
+
+<!-- Arrow glyphs are drawn, not typed: the Poppins subset carries no U+2192. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
+  <symbol id="i-right" viewBox="0 0 24 24">
+    <path d="M4 11h12.2l-4.6-4.6L13 5l7 7-7 7-1.4-1.4 4.6-4.6H4z"/>
+  </symbol>
+  <symbol id="i-left" viewBox="0 0 24 24">
+    <path d="M20 11H7.8l4.6-4.6L11 5l-7 7 7 7 1.4-1.4L7.8 13H20z"/>
+  </symbol>
+</svg>
+
+<div class="app">
+
+  <!-- ══ TOP BAR ══════════════════════════════════════════════════════════
+       Costa mark + a lockup built to the guideline masthead pattern: small
+       bold caps, stacked, closed by the yellow dot.
+
+       The mark is the white/yellow variant, chosen for the dark ground and
+       embedded by tools/build.py from c_full_white_yellow.png. To swap it
+       for another variant, change LOGO_SRC in that script and rebuild.
+  ══════════════════════════════════════════════════════════════════════════ -->
+  <header class="topbar">
+    <div class="lockup">
+      <img class="lockup__mark" src="/*__LOGO__*/" alt="Costa Crociere">
+      <div class="lockup__text">
+        <div class="lead">Feedback Management Dashboard<span class="dot dot--small"></span></div>
+      </div>
+    </div>
+
+    <div class="presenter" role="status" aria-live="off">
+      <div class="presenter__cell">
+        <span class="presenter__k">Case</span>
+        <span class="presenter__v num"><b id="p-case">—</b><span class="sep">/</span><span class="of" id="p-total">08</span></span>
+      </div>
+      <div class="presenter__cell">
+        <span class="presenter__k">Session</span>
+        <span class="presenter__v num" id="p-clock">00:00</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="main">
+    <main class="stage">
+
+      <!-- ══ 1. TITLE ══════════════════════════════════════════════════ -->
+      <section class="screen title-screen is-active" id="screen-title" aria-label="Title">
+        <h1 class="title-stack headline">
+          <span class="t1">The Broken</span>
+          <span class="t2">Loop<span class="dot"></span></span>
+        </h1>
+        <div class="sub ruled">
+          <span class="ruled__text">Feedback Decision Console</span>
+          <span class="ruled__line"></span>
+        </div>
+        <p class="strap">
+          Eight decisions. <b>No right answers.</b> Three instruments.<br>
+          Every choice moves all three, and every choice costs minutes.
+        </p>
+        <div class="legend" id="legend"></div>
+      </section>
+
+      <!-- ══ 2. CASE ═══════════════════════════════════════════════════ -->
+      <section class="screen case-screen" id="screen-case" aria-label="Case">
+        <div class="case-head">
+          <div class="eyebrow case-meta" id="c-meta"></div>
+          <p class="setup body-copy" id="c-setup"></p>
+          <h2 class="question ruled">
+            <span class="ruled__text" id="c-question"></span>
+            <span class="ruled__line"></span>
+          </h2>
+        </div>
+        <div class="options" id="c-options" role="group" aria-label="Options"></div>
+        <div class="notes" id="c-notes"></div>
+      </section>
+
+      <!-- ══ 3. CONSEQUENCE ════════════════════════════════════════════ -->
+      <section class="screen conseq-screen" id="screen-conseq" aria-label="Consequence">
+        <div class="conseq-chosen">
+          <span class="lead" id="q-lead"></span>
+          <h2 class="what vruled" id="q-what"></h2>
+          <p class="said" id="q-said"></p>
+        </div>
+        <p class="conseq-text body-copy" id="q-text"></p>
+        <div class="movement" id="q-movement"></div>
+        <div class="loop" id="q-loop"></div>
+        <div class="notes" id="q-notes"></div>
+      </section>
+
+      <!-- ══ 4. SUMMARY ════════════════════════════════════════════════
+           The three instruments lead. Time is present and still carries the
+           fastest-path comparison, but it no longer sets the headline. -->
+      <section class="screen summary-screen" id="screen-summary" aria-label="Summary">
+
+        <div class="kpis" id="s-kpis"></div>
+
+        <div class="sum-mid">
+          <div class="panel panel--read">
+            <div class="panel__k">How the feedback was processed</div>
+            <div class="profile__name" id="s-profile"></div>
+            <p class="readout" id="s-readout"></p>
+          </div>
+
+          <div class="panel">
+            <div class="panel__k">Diagnostics</div>
+            <div class="diag" id="s-diag"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__k">Where the loop gave way</div>
+            <div class="breaks" id="s-breaks"></div>
+          </div>
+        </div>
+
+        <div class="sum-foot">
+          <div class="panel panel--time">
+            <div class="panel__k">Time</div>
+            <div class="timerow">
+              <div class="timerow__c">
+                <span class="timerow__n num" id="s-spent">0</span>
+                <span class="timerow__l">minutes spent</span>
+              </div>
+              <div class="timerow__c timerow__c--alt">
+                <span class="timerow__n num" id="s-fast">0</span>
+                <span class="timerow__l">fastest path</span>
+              </div>
+              <p class="timerow__d" id="s-lede"></p>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__k">Where the room landed</div>
+            <div class="strip" id="s-strip"></div>
+          </div>
+        </div>
+
+        <div class="notes" id="s-notes"></div>
+      </section>
+
+    </main>
+
+    <!-- ══ INSTRUMENT RAIL ═══════════════════════════════════════════════ -->
+    <aside class="rail" aria-label="Instruments">
+      <!-- The instruments may compress on a short screen; minutes spent and
+           the reset never do — they live outside the scrolling region. -->
+      <div class="rail__scroll">
+        <div class="integrity">
+          <div class="integrity__k">Loop Integrity</div>
+          <div class="integrity__v num" id="r-integrity">—</div>
+          <div class="integrity__bar"><div class="integrity__fill" id="r-integrity-bar"></div></div>
+        </div>
+
+        <div class="gauges" id="r-gauges"></div>
+      </div>
+
+      <div class="rail__foot">
+        <div class="timecost">
+          <div class="timecost__k">Minutes spent</div>
+          <div class="timecost__row">
+            <span class="timecost__v num" id="r-minutes">0</span>
+            <span class="timecost__u">min</span>
+          </div>
+        </div>
+
+        <button class="reset" id="r-reset" type="button" title="Reset the console">
+          Reset <kbd>R</kbd>
+        </button>
+      </div>
+    </aside>
+  </div>
+</div>

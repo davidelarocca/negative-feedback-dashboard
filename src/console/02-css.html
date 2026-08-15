@@ -1,0 +1,346 @@
+
+/* ══════════════════════════════════════════════════════════════════════════
+   6. SCREENS
+   ══════════════════════════════════════════════════════════════════════════ */
+.screen{ display:none; flex-direction:column; min-height:0; flex:1 1 auto; }
+.screen.is-active{ display:flex; animation:screen-in .18s ease-out both; }
+@keyframes screen-in{ from{ opacity:0 } to{ opacity:1 } }
+
+/* — 6.1 TITLE — */
+.title-screen{ justify-content:center; gap:2.4rem; max-width:64rem; }
+.title-screen .headline{ font-size:7.4rem; }
+.title-screen .headline .t2{ color:var(--text); }
+.title-screen .sub{
+  font-size:2rem; font-weight:300; letter-spacing:.01em; color:var(--muted);
+  max-width:38rem;
+}
+.title-screen .strap{
+  font-size:1.4rem; font-weight:400; color:var(--c-slate); line-height:1.7;
+}
+.title-screen .strap b{ color:var(--text); font-weight:600; }
+
+/* key legend — low emphasis, shown on the title screen only */
+.legend{ display:flex; flex-wrap:wrap; gap:.5rem 1.6rem; margin-top:.4rem; }
+.legend__item{ display:flex; align-items:center; gap:.55rem; font-size:1.125rem; color:var(--c-slate); }
+.legend kbd{
+  font-family:inherit; font-size:1.125rem; font-weight:700; line-height:1;
+  color:var(--muted); background:rgba(0,0,0,.30);
+  border:1px solid var(--line-strong); border-radius:3px;
+  padding:.32em .55em; min-width:2.1em; text-align:center;
+  display:inline-flex; align-items:center; justify-content:center; gap:.2em;
+}
+.legend kbd svg{ width:.9em; height:.9em; fill:currentColor; }
+
+/* — 6.2 CASE — */
+.case-screen{ gap:1.5rem; }
+.case-head{ display:flex; flex-direction:column; gap:.9rem; }
+.case-meta{ display:flex; align-items:center; gap:.7rem; flex-wrap:wrap; }
+.case-meta .n{
+  font-size:1.125rem; font-weight:700; letter-spacing:.1em;
+  color:var(--ground); background:var(--accent);
+  padding:.2em .55em; border-radius:2px;
+}
+.case-meta .sep{ color:var(--c-teal-mid); }
+.setup{
+  font-size:1.75rem; font-weight:300; line-height:1.48; color:var(--text);
+  max-width:62rem;
+}
+.question{ font-size:2.5rem; font-weight:700; line-height:1.15; letter-spacing:-.01em; }
+
+/* option cards — 2×2 instrument bank */
+.options{
+  display:grid; grid-template-columns:repeat(2, minmax(0,1fr));
+  gap:1rem; min-height:0; flex:1 1 auto; align-content:start;
+}
+.option{
+  position:relative; display:flex; gap:1rem; text-align:left;
+  font-family:inherit; color:var(--text);
+  background:var(--panel); border:1px solid var(--line);
+  border-radius:3px; padding:1.1rem 1.3rem 1.15rem;
+  cursor:pointer; width:100%;
+  transition:background .16s, border-color .16s;
+}
+.option:hover{ background:var(--panel-raised); border-color:var(--line-strong); }
+.option__key{
+  flex:0 0 auto;
+  font-size:1.25rem; font-weight:700; line-height:1;
+  color:var(--muted); background:rgba(0,0,0,.32);
+  border:1px solid var(--line-strong); border-radius:3px;
+  width:2.2rem; height:2.2rem;
+  display:flex; align-items:center; justify-content:center;
+}
+.option__body{ display:block; flex:1 1 auto; min-width:0; }
+.option__label{
+  display:block;
+  font-size:1.125rem; font-weight:700; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:.35rem;
+}
+.option__text{ display:block; font-size:1.35rem; font-weight:300; line-height:1.42; }
+.option:hover .option__key{ color:var(--text); }
+
+/* — 6.3 CONSEQUENCE — */
+.conseq-screen{ gap:1.4rem; }
+.conseq-chosen{ display:flex; flex-direction:column; gap:.5rem; }
+.conseq-chosen .lead{
+  font-size:1.125rem; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--c-slate);
+}
+.conseq-chosen .what{ font-size:2.3rem; font-weight:700; line-height:1.12; letter-spacing:-.01em; }
+.conseq-chosen .said{
+  font-size:1.35rem; font-weight:300; line-height:1.45;
+  color:var(--muted); max-width:62rem;
+}
+.conseq-text{
+  font-size:1.6rem; font-weight:300; line-height:1.62; color:var(--text);
+  max-width:60rem;
+}
+
+/* movement read-out: the deltas this choice produced.
+   Pinned to the foot of the stage so the read-outs sit along the bottom edge
+   like the rest of the instrument panel. */
+.movement{ display:flex; flex-wrap:wrap; gap:.7rem; margin-top:auto; }
+.delta{
+  display:flex; align-items:baseline; gap:.55rem;
+  border:1px solid var(--line); border-radius:3px;
+  background:var(--panel); padding:.5rem .95rem .55rem;
+}
+.delta__k{
+  font-size:1.125rem; font-weight:600; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--muted);
+}
+.delta__v{ font-size:1.5rem; font-weight:600; line-height:1; }
+.delta--gain .delta__v{ color:var(--gain); }
+.delta--loss .delta__v{ color:var(--loss); }
+.delta--flat .delta__v{ color:var(--flat); }
+.delta--time{ border-color:var(--accent); background:rgba(249,176,0,.10); }
+.delta--time .delta__k{ color:var(--c-amber-light); }
+.delta--time .delta__v{ color:var(--text); }
+
+/* the five loop points */
+.loop{ display:grid; grid-template-columns:repeat(5, minmax(0,1fr)); gap:.7rem; }
+.loop__pt{
+  border:1px solid var(--line); border-top:3px solid var(--c-teal-mid);
+  background:var(--panel); border-radius:0 0 3px 3px; padding:.7rem .85rem .75rem;
+}
+.loop__state{
+  font-size:1.125rem; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--c-slate); margin-bottom:.25rem;
+}
+.loop__name{ font-size:1.25rem; font-weight:600; line-height:1.25; color:var(--text); }
+.loop__where{ font-size:1.125rem; font-weight:300; color:var(--c-slate); line-height:1.3; margin-top:.2rem; }
+.loop__pt.is-hold{ border-top-color:var(--accent); }
+.loop__pt.is-hold .loop__state{ color:var(--accent); }
+.loop__pt.is-break{ border-top-color:var(--loss); background:rgba(199,119,6,.09); }
+.loop__pt.is-break .loop__state{ color:var(--c-amber-mid); }
+.loop__pt.is-break .loop__name{ color:var(--text); }
+
+/* the rail steps aside on the summary */
+.main.no-rail{ grid-template-columns:minmax(0,1fr); }
+.main.no-rail .rail{ display:none; }
+
+/* — 6.4 SUMMARY —
+   The three instruments are the outcome; time supports it. The rail steps
+   aside here so the KPIs get the full width and the whole screen fits with
+   nothing to scroll. */
+.summary-screen{ display:flex; flex-direction:column; gap:.7rem; min-height:0; }
+
+/* ── the three instruments, full size ── */
+.kpis{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:.7rem; flex:.82 1 0; min-height:0; }
+.kpi{
+  border:1px solid var(--line-strong); background:var(--panel-raised);
+  border-radius:3px; padding:.8rem 1.1rem .7rem;
+  display:flex; flex-direction:column; min-height:0;
+}
+.kpi__top{ display:flex; align-items:baseline; justify-content:space-between; gap:.6rem; }
+.kpi__k{
+  font-size:1.25rem; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted);
+}
+.kpi__v{ font-size:2.6rem; font-weight:600; line-height:1; }
+.kpi__v.is-gain{ color:var(--gain); }
+.kpi__v.is-loss{ color:var(--loss); }
+.kpi__v.is-flat{ color:var(--flat); }
+/* auto margins centre the dial in whatever height the card gets */
+.kpi__svg{ display:block; width:100%; height:auto; max-height:7.2rem; margin:auto 0 .5rem; flex:0 1 auto; }
+.kpi__d{ font-size:1.125rem; font-weight:300; line-height:1.35; color:var(--muted); }
+
+/* ── the reading and the diagnostics ── */
+/* Three columns rather than two: stacking the diagnostics above the break
+   points made that one column twice as tall as the row could ever be. */
+.sum-mid{ display:grid; grid-template-columns:1.75fr 1fr 1.05fr; gap:.7rem; flex:1 1 0; min-height:0; }
+.panel{
+  border:1px solid var(--line); background:var(--panel);
+  border-radius:3px; padding:.75rem 1.1rem .85rem;
+  display:flex; flex-direction:column; min-height:0;
+}
+.panel__k{
+  font-size:1.125rem; font-weight:600; letter-spacing:.15em;
+  text-transform:uppercase; color:var(--muted); margin-bottom:.45rem;
+}
+.profile__name{ font-size:2rem; font-weight:700; line-height:1.05; letter-spacing:-.015em; }
+.readout{
+  font-size:1.25rem; font-weight:300; line-height:1.45; color:var(--text);
+  margin-top:.45rem;
+}
+
+/* The reading is generated, so its length varies with the run. The panel
+   clips and the engine steps the size down until it fits — no scrollbar, and
+   no run that silently loses its last sentence. */
+.panel--read{ overflow:hidden; }
+
+/* four dimensions behind the reading */
+.diag{ display:grid; grid-template-columns:1fr 1fr; gap:.5rem .9rem; align-content:start; }
+.diag__c{ display:flex; flex-direction:column; gap:.05rem; }
+.diag__k{
+  font-size:1.125rem; font-weight:600; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--c-slate);
+}
+.diag__v{ font-size:1.5rem; font-weight:600; line-height:1.1; color:var(--text); }
+.diag__v small{ font-size:.62em; font-weight:400; color:var(--muted); margin-left:.2em; }
+
+/* which of the five gave way, and how often */
+.breaks{ display:flex; flex-direction:column; gap:.3rem; min-height:0; justify-content:center; flex:1 1 auto; }
+.brk{ display:flex; align-items:center; gap:.6rem; }
+/* one line each: a wrapped label doubles the row height and pushes the
+   last of the five out of the panel */
+.brk__k{ flex:0 0 9.6rem; font-size:1.125rem; font-weight:400; color:var(--muted); white-space:nowrap; }
+.brk__t{ flex:1 1 auto; height:.55rem; background:rgba(0,0,0,.28); border-radius:1px; overflow:hidden; }
+.brk__f{ height:100%; width:0; background:var(--loss); transition:width .5s var(--ease-settle); }
+.brk__n{ flex:0 0 1.6rem; text-align:right; font-size:1.125rem; font-weight:600; color:var(--text); }
+.brk.is-clean .brk__n{ color:var(--c-teal-mid); }
+
+/* ── time, supporting ── */
+.sum-foot{ display:grid; grid-template-columns:1.15fr 1fr; gap:.7rem; flex:0 0 auto; }
+.panel--time{ border-color:rgba(249,176,0,.45); background:linear-gradient(180deg, rgba(249,176,0,.10), rgba(249,176,0,.03)); }
+.panel--time .panel__k{ color:var(--c-amber-light); }
+.timerow{ display:flex; align-items:baseline; gap:1.3rem; }
+.timerow__c{ display:flex; align-items:baseline; gap:.4rem; flex:0 0 auto; }
+.timerow__n{ font-size:2.3rem; font-weight:300; line-height:1; letter-spacing:-.02em; }
+.timerow__c--alt .timerow__n{ color:var(--muted); }
+.timerow__l{
+  font-size:1.125rem; font-weight:600; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--c-slate);
+}
+.timerow__d{ flex:1 1 auto; font-size:1.125rem; font-weight:300; line-height:1.35; color:var(--muted); }
+
+/* per-case strip */
+.strip{ display:grid; grid-template-columns:repeat(8, minmax(0,1fr)); gap:.35rem; }
+.strip__c{
+  border:1px solid var(--line); border-radius:3px;
+  background:rgba(0,0,0,.18); padding:.35rem .4rem .4rem;
+  display:flex; flex-direction:column; gap:.2rem; min-width:0;
+}
+.strip__n{ font-size:1.125rem; font-weight:700; color:var(--accent); letter-spacing:.06em; }
+.strip__pips{ display:flex; gap:.16rem; align-items:flex-end; height:1.1rem; }
+.pip{ flex:1 1 0; background:var(--flat); min-height:2px; border-radius:1px; }
+.pip.is-gain{ background:var(--gain); }
+.pip.is-loss{ background:var(--loss); }
+.strip__t{ font-size:1.125rem; font-weight:600; color:var(--c-slate); }
+.strip__c.is-skipped .strip__n{ color:var(--c-teal-mid); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   7. FACILITATOR LAYER — hidden by default
+   ══════════════════════════════════════════════════════════════════════════ */
+.notes{
+  display:none;
+  border:1px solid var(--c-blue-light);
+  background:linear-gradient(180deg, rgba(0,138,186,.15), rgba(0,138,186,.05));
+  border-radius:3px; padding:.9rem 1.2rem 1rem;
+}
+.notes.is-on{ display:block; }
+.notes__k{
+  font-size:1.125rem; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--c-blue-light); margin-bottom:.4rem;
+}
+.notes__body{ font-size:1.25rem; font-weight:300; line-height:1.5; color:var(--text); max-width:74rem; }
+.notes__body em{ color:var(--c-amber-light); font-style:italic; }
+.notes__map{
+  margin-top:.6rem; padding-top:.55rem; border-top:1px solid rgba(0,138,186,.28);
+  font-size:1.125rem; color:var(--muted); display:flex; gap:1.1rem; flex-wrap:wrap;
+}
+.notes__map b{ color:var(--text); font-weight:600; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   8. RESPONSIVE — 1920 first, degrading to laptop
+   ══════════════════════════════════════════════════════════════════════════ */
+@media (max-width:1500px){
+  .main{ grid-template-columns:minmax(0,1fr) 22rem; }
+  .stage{ padding:1.6rem 1.9rem 1.5rem; }
+  .title-screen .headline{ font-size:5.6rem; }
+  .kpi__v{ font-size:2.2rem; }
+  .profile__name{ font-size:1.75rem; }
+}
+@media (max-width:1180px){
+  .main{ grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr) auto; }
+  .rail{
+    border-left:none; border-top:1px solid var(--line);
+    flex-direction:row; align-items:stretch; gap:.7rem; padding:.9rem 1.2rem;
+  }
+  .rail__scroll{ flex-direction:row; overflow:visible; gap:.7rem; }
+  .rail__foot{ flex-direction:row; gap:.7rem; }
+  .integrity{ flex:0 0 12rem; }
+  .integrity__v{ font-size:2.6rem; }
+  .gauges{ flex:1 1 auto; flex-direction:row; }
+  .gauge{ flex:1 1 0; min-width:0; }
+  .timecost{ flex:0 0 10rem; }
+  .reset{ flex:0 0 auto; padding:.5rem .9rem; }
+  /* Below the presentation sizes this is a fallback layout, so the stage may
+     scroll rather than clip. */
+  .stage{ overflow-y:auto; }
+  .movement{ margin-top:1rem; }
+  .options{ grid-template-columns:minmax(0,1fr); }
+  .loop{ grid-template-columns:repeat(3, minmax(0,1fr)); }
+  .strip{ grid-template-columns:repeat(4, minmax(0,1fr)); }
+}
+/* Laptops around 900px tall: tighten the rail, keep every read-out. */
+@media (max-height:960px){
+  .rail{ padding:1rem 1.2rem .9rem; gap:.7rem; }
+  .rail__scroll{ gap:.7rem; }
+  .integrity{ padding:.7rem 1rem .8rem; }
+  .integrity__v{ font-size:3.4rem; }
+  .gauges{ gap:.6rem; }
+  .gauge{ padding:.5rem .8rem .35rem; }
+  .timecost{ padding:.65rem 1rem .7rem; }
+  .timecost__v{ font-size:2.5rem; }
+}
+
+@media (max-height:820px){
+  .title-screen .headline{ font-size:5rem; }
+  .setup{ font-size:1.5rem; }
+  .question{ font-size:2rem; }
+  .conseq-text{ font-size:1.4rem; }
+  /* On a short screen the dials give up height so the diagnostics keep all
+     five break points inside their panel. */
+  .kpis{ flex:.72 1 0; }
+  .kpi__v{ font-size:2rem; }
+  .kpi__svg{ max-height:6.4rem; }
+  .profile__name{ font-size:1.6rem; }
+  .readout{ font-size:1.125rem; }
+  .timerow__n{ font-size:1.9rem; }
+
+  /* Compress the rail so the whole instrument panel still fits on a laptop.
+     The gauge captions go first — the trainer says those out loud anyway. */
+  .rail{ padding:.9rem 1.1rem .9rem; gap:.6rem; }
+  .rail__scroll{ gap:.6rem; }
+  .integrity{ padding:.6rem .9rem .7rem; }
+  .integrity__v{ font-size:2.7rem; }
+  .integrity__bar{ margin-top:.45rem; }
+  .gauges{ gap:.5rem; }
+  .gauge{ padding:.5rem .8rem .35rem; }
+  .gauge__svg{ max-height:3.9rem; }
+  .timecost{ padding:.6rem .9rem .65rem; }
+  .timecost__v{ font-size:2.2rem; }
+}
+
+/* Motion is reserved for the needles. Honour the user's preference anyway. */
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{
+    animation-duration:.001ms !important;
+    animation-iteration-count:1 !important;
+    transition-duration:.001ms !important;
+  }
+}
+
+@media print{ body{ overflow:visible; height:auto; } }
+</style>
+</head>

@@ -1,0 +1,265 @@
+
+/* ══════════════════════════════════════════════════════════════════════════
+   5. SLIDE CONTAINER
+   ══════════════════════════════════════════════════════════════════════════ */
+#slides{ position:absolute; inset:0; z-index:1; }
+.rail{ z-index:3; }
+.presenter{ z-index:3; }
+.notes{ z-index:5; }
+.help{ z-index:7; }
+
+.slide{
+  position:absolute; inset:0;
+  padding:52px 72px 92px;
+  display:none; flex-direction:column;
+}
+.slide.is-active{ display:flex; }
+.slide.has-rail{ padding-top:104px; }
+.slide.is-center{ justify-content:center; align-items:flex-start; }
+
+[data-until]{ transition:opacity 520ms var(--ease-out); }
+[data-until].faded{ opacity:0; pointer-events:none; }
+@media (prefers-reduced-motion:reduce){ [data-until]{ transition:opacity .001ms; } }
+
+/* Density steps for the slides that carry the most content. */
+.tight .gap-m{ gap:17px; }
+.tight .gap-s{ gap:14px; }
+.tight .body { font-size:24px; }
+
+.dense .headline    { font-size:46px; }
+.dense .display     { font-size:42px; }
+.dense .lead        { font-size:26px; }
+.dense .body        { font-size:24px; }
+.dense .gap-l       { gap:26px; }
+.dense .gap-m       { gap:22px; }
+.dense .gap-s       { gap:14px; }
+.dense .data-row__v { font-size:40px; }
+.dense .quote       { font-size:36px; padding-left:26px; }
+.dense .pair        { gap:56px; }
+.dense .pair__n     { font-size:64px; }
+.dense .pair__l     { font-size:20px; max-width:250px; }
+.dense .trade__r    { padding:11px 0; }
+.dense .trade__n    { font-size:23px; }
+.dense .trade__t    { font-size:20px; flex-basis:84px; }
+.dense .mk          { width:82px; }
+.dense .instr__d    { font-size:22px; }
+.dense .buys        { gap:16px; }
+.dense .buys__d     { font-size:22px; }
+.dense .buys__k     { font-size:26px; flex-basis:220px; }
+
+.stack   { display:flex; flex-direction:column; }
+.gap-xs  { gap:12px; }  .gap-s{ gap:20px; }  .gap-m{ gap:32px; }
+.gap-l   { gap:48px; }  .gap-xl{ gap:64px; }
+.push    { margin-top:auto; }
+.mw-sm{ max-width:720px; }  .mw-md{ max-width:900px; }  .mw-lg{ max-width:1040px; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   6. COMPONENTS
+   ══════════════════════════════════════════════════════════════════════════ */
+.stat{ display:flex; flex-direction:column; gap:10px; }
+.stat__n{ font-size:104px; }
+.stat__n--sm{ font-size:76px; }
+.stat__l{ font-size:24px; font-weight:300; line-height:1.4; color:var(--ink-soft); }
+.stats-row{ display:flex; gap:56px; align-items:flex-start; }
+.stats-row > *{ flex:1 1 0; min-width:0; }
+
+.split{ display:flex; gap:56px; align-items:stretch; }
+.split > .col{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; gap:20px; }
+.split > .divider{ flex:0 0 1px; align-self:stretch; }
+
+.cols3{ display:flex; gap:44px; align-items:stretch; }
+.cols3 > .col{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; gap:16px; }
+.cols3 > .divider{ flex:0 0 1px; }
+.col__k{ font-size:34px; font-weight:600; letter-spacing:-.02em; }
+
+.cycle{ display:flex; gap:14px; }
+.cycle__b{
+  flex:1 1 0; text-align:center;
+  border:1px solid var(--frame); border-radius:3px;
+  padding:20px 12px; font-size:24px; font-weight:400;
+}
+
+.data-row{ display:flex; gap:0; align-items:flex-end; }
+.data-row__c{
+  flex:1 1 0; min-width:0;
+  display:flex; flex-direction:column; gap:8px; align-items:flex-start;
+  padding-right:16px;
+}
+.data-row__v{ font-size:44px; }
+.data-row__k{ font-size:18px; font-weight:400; letter-spacing:.04em; color:var(--mute); white-space:nowrap; }
+
+.spiral{ display:flex; gap:64px; align-items:center; }
+.spiral__svg{ flex:0 0 300px; width:300px; height:300px; }
+.spiral__steps{ flex:1 1 auto; display:flex; flex-direction:column; gap:18px; }
+.spiral__step{ display:flex; gap:18px; align-items:baseline; }
+.spiral__n{ font-size:18px; font-weight:700; color:var(--accent); flex:0 0 auto; width:26px; letter-spacing:.04em; }
+.spiral__t{ font-size:24px; font-weight:300; line-height:1.4; color:var(--ink-soft); }
+.sp-arc{
+  fill:none; stroke:var(--accent); stroke-width:5; stroke-linecap:round;
+  stroke-dasharray:176; stroke-dashoffset:176;
+  transition:stroke-dashoffset 560ms var(--ease-mask);
+}
+.shown .sp-arc, .sp-arc.shown{ stroke-dashoffset:0; }
+.sp-node{ fill:var(--paper); stroke:var(--accent); stroke-width:4; }
+.sp-track{ fill:none; stroke:var(--frame); stroke-width:5; }
+@media (prefers-reduced-motion:reduce){ .sp-arc{ transition:none; stroke-dashoffset:0; } }
+
+.quote{
+  font-size:44px; font-weight:300; line-height:1.3; letter-spacing:-.015em;
+  border-left:3px solid var(--accent); padding-left:32px;
+}
+.pair{ display:flex; gap:72px; align-items:flex-start; }
+.pair__c{ display:flex; flex-direction:column; gap:10px; }
+.pair__n{ font-size:96px; }
+.pair__l{ font-size:22px; font-weight:300; line-height:1.4; color:var(--ink-soft); max-width:280px; }
+
+.said{ font-size:46px; font-weight:300; line-height:1.28; letter-spacing:-.02em; }
+.said--muted{ font-size:30px; color:var(--mute); }
+
+/* ── the three instruments (new) ──
+   Each carries its name, what it measures, and the break points it depends
+   on, so the room reads the dashboard's gauges before it touches them. */
+.instr{ display:flex; gap:36px; align-items:stretch; }
+.instr__c{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; gap:14px; }
+.instr__top{ display:flex; align-items:center; gap:16px; }
+.instr__dial{ flex:0 0 66px; width:66px; height:38px; }
+.instr__k{ font-size:30px; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+.instr__d{ font-size:24px; font-weight:300; line-height:1.4; color:var(--ink-soft); }
+.instr__tie{
+  font-size:18px; font-weight:400; line-height:1.45; color:var(--mute);
+  padding-top:12px; border-top:1px solid var(--frame);
+}
+.instr__tie b{ color:var(--ink); font-weight:600; }
+.dial-track{ fill:none; stroke:var(--frame); stroke-width:6; stroke-linecap:round; }
+.dial-live{ fill:none; stroke:var(--accent); stroke-width:6; stroke-linecap:round; }
+.dial-needle{ stroke:var(--ink); stroke-width:3; stroke-linecap:round; }
+
+/* ── the trade (new) ── three moves, three different shapes of cost ── */
+.trade{ display:flex; flex-direction:column; gap:2px; }
+.trade__r{
+  display:flex; align-items:center; gap:28px;
+  padding:16px 0; border-bottom:1px solid var(--frame);
+}
+.trade__n{ flex:1 1 auto; font-size:26px; font-weight:300; line-height:1.35; }
+.trade__marks{ flex:0 0 auto; display:flex; gap:26px; }
+.mk{ display:flex; flex-direction:column; align-items:center; gap:7px; width:92px; }
+.mk__k{ font-size:18px; font-weight:600; letter-spacing:.1em; text-transform:uppercase; color:var(--mute); }
+.mk__bar{ width:100%; height:8px; background:var(--frame); position:relative; border-radius:1px; }
+.mk__fill{
+  position:absolute; top:0; bottom:0; left:50%; width:0;
+  background:var(--accent); border-radius:1px;
+  transition:width 620ms var(--ease-mask), left 620ms var(--ease-mask);
+}
+.mk--up   .mk__fill{ left:50%; }
+.mk--down .mk__fill{ background:var(--down); }
+.shown .mk--up   .mk__fill{ width:50%; }
+.shown .mk--down .mk__fill{ width:50%; left:0; }
+.shown .mk--flat .mk__fill{ width:6%; left:47%; background:var(--mute); }
+.trade__t{ flex:0 0 96px; text-align:right; font-size:22px; font-weight:600; color:var(--ink); }
+@media (prefers-reduced-motion:reduce){ .mk__fill{ transition:none; } }
+
+/* ── what it buys (new) ── */
+.buys{ display:flex; flex-direction:column; gap:22px; }
+.buys__r{ display:flex; gap:28px; align-items:flex-start; padding-left:24px; border-left:3px solid var(--accent); }
+.buys__k{ flex:0 0 250px; font-size:28px; font-weight:600; letter-spacing:-.01em; }
+.buys__d{ flex:1 1 auto; font-size:24px; font-weight:300; line-height:1.45; color:var(--ink-soft); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   7. PRESENTER CHROME
+   Counter and clock only — the key hints live behind H so the shared screen
+   carries no instructions the audience does not need.
+   ══════════════════════════════════════════════════════════════════════════ */
+.presenter{
+  position:absolute; left:72px; bottom:40px;
+  display:flex; align-items:center; gap:18px;
+  font-size:18px; font-weight:600; color:var(--mute);
+  letter-spacing:.08em; font-variant-numeric:tabular-nums;
+}
+.presenter__n b{ color:var(--ink); font-weight:700; }
+.presenter__n .of{ opacity:.55; }
+.presenter__tick{ width:1px; height:15px; background:var(--rule); }
+.presenter__h{
+  font-size:15px; font-weight:700; letter-spacing:.06em;
+  color:var(--mute); opacity:.5;
+  border:1px solid var(--rule); border-radius:3px;
+  width:22px; height:22px; display:flex; align-items:center; justify-content:center;
+}
+
+/* speaker notes */
+.notes{
+  position:absolute; left:0; right:0; bottom:0;
+  background:var(--paper); border-top:1px solid var(--rule);
+  padding:26px 72px 30px;
+  transform:translateY(101%);
+  transition:transform 420ms var(--ease-mask);
+  max-height:360px; overflow-y:auto;
+}
+.notes.on{ transform:none; }
+.notes__k{
+  font-size:18px; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:10px;
+}
+.notes__b{ font-size:22px; font-weight:300; line-height:1.5; color:var(--ink-soft); max-width:1040px; }
+.notes__b em{ color:var(--ink); font-style:italic; }
+
+/* ── H · the controls panel ── */
+.help{
+  position:absolute; inset:0;
+  display:flex; align-items:center; justify-content:center;
+  background:color-mix(in srgb, var(--paper) 88%, transparent);
+  opacity:0; pointer-events:none;
+  transition:opacity 320ms var(--ease-out);
+}
+.help.on{ opacity:1; pointer-events:auto; }
+.help__panel{
+  border:1px solid var(--rule); background:var(--paper);
+  padding:44px 56px 46px; min-width:560px;
+  transform:translateY(14px);
+  transition:transform 420ms var(--ease-mask);
+}
+.help.on .help__panel{ transform:none; }
+.help__k{
+  font-size:18px; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--mute); margin-bottom:6px;
+}
+.help__t{ font-size:38px; font-weight:600; letter-spacing:-.02em; margin-bottom:26px; }
+.help__rows{ display:flex; flex-direction:column; gap:0; }
+.help__r{
+  display:flex; align-items:center; gap:24px;
+  padding:13px 0; border-top:1px solid var(--frame);
+}
+.help__r:last-child{ border-bottom:1px solid var(--frame); }
+.help__keys{ flex:0 0 210px; display:flex; gap:8px; flex-wrap:wrap; }
+.help__d{ flex:1 1 auto; font-size:22px; font-weight:300; color:var(--ink-soft); }
+kbd{
+  font-family:inherit; font-size:18px; font-weight:700; line-height:1;
+  color:var(--ink); background:transparent;
+  border:1px solid var(--rule); border-radius:4px;
+  padding:.34em .6em; min-width:2.2em; text-align:center;
+  display:inline-flex; align-items:center; justify-content:center;
+}
+kbd svg{ width:.95em; height:.95em; fill:currentColor; }
+.help__foot{ margin-top:24px; font-size:18px; color:var(--mute); }
+@media (prefers-reduced-motion:reduce){
+  .help, .help__panel, .notes{ transition:none; }
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   8. THE HANDOFF
+   Full-bleed at real viewport size — the dashboard carries its own responsive
+   layout and must not be scaled inside the deck's canvas.
+   ══════════════════════════════════════════════════════════════════════════ */
+.console{
+  position:fixed; inset:0; width:100%; height:100%;
+  border:0; background:#00324A;
+  opacity:0; pointer-events:none;
+  transition:opacity 460ms var(--ease-out);
+  z-index:40;
+}
+.console.on{ opacity:1; pointer-events:auto; }
+@media (prefers-reduced-motion:reduce){ .console{ transition:none; } }
+
+.fallback{ display:none; }
+.fallback.on{ display:block; }
+</style>
+</head>
