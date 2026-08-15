@@ -164,9 +164,23 @@ rebuild:
 
 ```
 python3 tools/build.py          # both files
-python3 tools/build.py console  # just the console
+python3 tools/build.py console  # just the dashboard
 python3 tools/build.py deck     # just the deck
+
+npm install && npm test         # verify both in a real browser
 ```
+
+`tests/verify.mjs` drives the built files in Chromium rather than inspecting
+source, because everything worth checking is a rendered property: whether a
+line fits its box, whether the deck's dark ground is the same colour as the
+dashboard's, whether Escape inside the frame reaches the deck. It covers the
+full round and the summary at five viewport sizes, every slide against the
+720px canvas, the rail sequence, the handoff handshake, reduced motion, and
+that neither file makes a single external request. `.github/workflows/verify.yml`
+runs it on every push, and also rebuilds and fails if the committed HTML is
+not what `src/` currently produces.
+
+Set `PW_CHROMIUM` to point at an existing browser instead of Playwright's own.
 
 Each option is:
 
@@ -204,7 +218,9 @@ src/deck/05-app.js             canvas scaling, reveals, rail, inversion, handoff
 
 tools/build.py                 inlines fonts + mark, verifies nothing leaks out
 tools/subset-fonts.py          regenerates the WOFF2 subsets from the full TTFs
-assets/fonts/                  Poppins + IBM Plex Mono subsets, OFL licence
+assets/fonts/                  Poppins subsets, OFL licence
+tests/verify.mjs               drives both built files in a real browser
+.github/workflows/verify.yml   runs the suite, and checks the build is current
 ```
 
 Both HTML files are generated — edit `src/` and rebuild rather than editing them

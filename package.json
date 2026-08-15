@@ -1,0 +1,13 @@
+{
+  "name": "broken-loop",
+  "private": true,
+  "type": "module",
+  "description": "The Broken Loop — leadership training deck and feedback management dashboard",
+  "scripts": {
+    "build": "python3 tools/build.py",
+    "test": "node tests/verify.mjs"
+  },
+  "devDependencies": {
+    "playwright": "^1.49.0"
+  }
+}
