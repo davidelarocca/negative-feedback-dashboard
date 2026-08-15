@@ -1,16 +1,33 @@
-# The Broken Loop — Feedback Decision Console
+# The Broken Loop
 
-An interactive decision console for a 15-minute leadership training on delivering
-negative feedback, aboard a Costa Cruises ship. The trainer presents it fullscreen
-over a video call and drives it entirely from the keyboard. Directors and Heads of
-Department answer out loud; the trainer registers the room's choice.
+A 15-minute leadership training on delivering negative feedback, aboard a Costa
+Cruises ship. Audience: Directors and Heads of Department. Delivered fullscreen
+over a video call, driven entirely from the keyboard.
 
-It is not a quiz. There is no answer key. Every choice moves three instruments, and
-no choice moves all three in the same direction for free. The point the console
-makes on its own, without stating it, is that **the fast option and the good option
-are different options, and the difference is measured in minutes.**
+Two files, two halves of one session:
+
+| File | Ground | Role |
+|---|---|---|
+| `broken-loop-deck.html` | light | 22 slides. Carries the argument. |
+| `broken-loop.html` | dark | The decision console. The checkpoint in the middle of it. |
+
+The presenter runs the deck to slide 18, hands over to the console, plays the
+eight cases with the room answering out loud, and returns to the deck at slide 19.
+
+The contrast between the two is load-bearing: the light ground is the argument,
+the dark ground is where the room stops listening and starts deciding. They do
+not match in tone. They match in system — same palette, same type, same spacing
+rhythm, inverted.
 
 ---
+
+# Part one — the console
+
+An interactive decision console. It is not a quiz. There is no answer key. Every
+choice moves three instruments, and no choice moves all three in the same
+direction for free. The point the console makes on its own, without stating it,
+is that **the fast option and the good option are different options, and the
+difference is measured in minutes.**
 
 ## 1. Running it
 
@@ -121,11 +138,14 @@ Cropped to its content box and embedded at 3× the rendered size.
 
 ## 6. Editing
 
-All training copy lives in `src/04-content.js` and nowhere else. Rendering logic
-in `src/05-app.js` contains no training text. Change a case, then rebuild:
+All training copy lives in `src/console/04-content.js` and nowhere else. Rendering
+logic in `src/console/05-app.js` contains no training text. Change a case, then
+rebuild:
 
 ```
-python3 tools/build.py          # regenerates broken-loop.html from src/
+python3 tools/build.py          # both files
+python3 tools/build.py console  # just the console
+python3 tools/build.py deck     # just the deck
 ```
 
 Each option is:
@@ -148,17 +168,26 @@ session, change `min` values — the fastest path recomputes itself.
 
 ```
 broken-loop.html            ← GENERATED, self-contained. Open and share this.
-src/01-head.html               tokens, brand type rules, shell, instrument rail
-src/02-css.html                screens, options, summary, responsive
-src/03-body.html               markup
-src/04-content.js              ALL training copy — the only file to edit
-src/05-app.js                  state, gauges, scoring, presenter controls
+broken-loop-deck.html       ← GENERATED, self-contained. The presentation.
+
+src/console/01-head.html       tokens, brand type rules, shell, instrument rail
+src/console/02-css.html        screens, options, summary, responsive
+src/console/03-body.html       markup
+src/console/04-content.js      ALL training copy — the only file to edit
+src/console/05-app.js          state, gauges, scoring, presenter controls
+
+src/deck/01-head.html          tokens, type scale, the five motion effects
+src/deck/02-css.html           slide layouts, presenter chrome, handoff
+src/deck/03-slides.js          ALL presentation copy — the only file to edit
+src/deck/04-body.html          markup
+src/deck/05-app.js             canvas scaling, reveals, rail, inversion, handoff
+
 tools/build.py                 inlines fonts + mark, verifies nothing leaks out
 tools/subset-fonts.py          regenerates the WOFF2 subsets from the full TTFs
-assets/fonts/                  Poppins subsets + OFL licence
+assets/fonts/                  Poppins + IBM Plex Mono subsets, OFL licence
 ```
 
-`broken-loop.html` is generated — edit `src/` and rebuild rather than editing it
+Both HTML files are generated — edit `src/` and rebuild rather than editing them
 by hand.
 
 ## 7. Accessibility and robustness
@@ -171,3 +200,115 @@ by hand.
   on screen at every supported size; the instruments compress instead.
 - Poppins is licensed under the SIL Open Font Licence 1.1, which permits
   embedding. Licence text: `assets/fonts/OFL.txt`.
+
+---
+
+# Part two — the deck
+
+22 slides, light ground, one idea per slide. Same constraints as the console:
+one self-contained file, fully offline, keyboard-first.
+
+## 8. Running it
+
+**Open `broken-loop-deck.html`.** Keep `broken-loop.html` in the same folder —
+the deck loads it for the handoff on slide 18.
+
+| Key | Action |
+|---|---|
+| `→` / `Space` / click | Advance one reveal step, then one slide |
+| `←` | Back |
+| `N` | Speaker notes |
+| `F` | Fullscreen |
+| `R` | Reset |
+| `Esc` | Return from the console · close the notes panel |
+
+The presenter strip sits bottom-left with the slide counter and an elapsed clock
+that starts on the first key press. It is styled as part of the design because it
+is visible on the shared screen.
+
+## 9. The fixed canvas
+
+Every slide is laid out inside a fixed **1280×720** canvas, centred and scaled to
+the viewport with `transform: scale()`, recalculated on load and on resize. 1920×1080
+and 1366×768 are therefore the same picture at two sizes — no reflow, no scrolling,
+nothing the presenter did not rehearse. Nothing on any slide is below 18px inside
+that canvas.
+
+Two slides carry more than the base type scale fits in 720px, and the five
+break-point slides give 52px of their height to the rail. Rather than shrinking
+the whole deck to its worst case, those slides step down one density notch
+(`.tight` for the 07–11 run, so the sequence still reads as one; `.dense` for the
+heaviest standalone slides).
+
+## 10. The handoff
+
+Slide 18 hands over to the console, preferring the embedded route so the presenter
+never leaves the deck:
+
+1. The console is preloaded into a hidden full-bleed iframe when the deck opens,
+   so there is nothing left to load at the handoff.
+2. Local-file frames are cross-origin in Chrome, so the console announces itself
+   over `postMessage` when it detects it is embedded. The deck waits for that
+   handshake.
+3. On the handshake, the frame fades in and takes keyboard focus. `Esc` inside the
+   console posts back and the deck goes to slide 19.
+4. **If the handshake never arrives** the frame is not usable, so the deck opens
+   the console in a new tab instead of leaving a dead frame on screen. If the
+   browser also blocks the popup, the slide says which file to open. `Esc` still
+   returns to slide 19.
+
+The console is unchanged when run on its own: the bridge is guarded by
+`window.parent !== window` and does nothing standalone.
+
+## 11. The inversion
+
+Arriving at slide 18 the deck inverts from paper to the console's dark navy over
+700ms, all type crossfading with it; slide 19 inverts back on its first step. These
+are the only two full-screen transitions in the deck.
+
+The dark values *are* the console's values — `#00324A` ground, `#EBE9E8` type — so
+by the time the console appears the screen is already exactly its colour and there
+is nothing to see happening. Verified in-browser: deck ground and console ground
+both resolve to `rgb(0, 50, 74)`.
+
+The ground is derived from position (`slide 18`, or `slide 19 step 0`) rather than
+tracked as an event, so every route through it — forward, back, reset, returning
+from the console — lands on the right colour.
+
+## 12. Motion system
+
+Five effects, defined once and reused. Everything else stays still so the
+inversion lands.
+
+| Effect | Where |
+|---|---|
+| Rise-in | 12px up + fade, 420ms ease-out, staggered 80ms across a group |
+| Count-up | every statistic animates from zero over 900ms |
+| Rule-draw | hairlines and dividers draw left to right over 500ms |
+| The loop rail | slides 07–11: current break point in accent, passed ones dimmed, coming ones empty. Fades rather than cuts. |
+| The inversion | slides 18 and 19 only |
+
+`prefers-reduced-motion` reduces all of it to instant opacity changes.
+
+## 13. Deck palette
+
+The same Costa tokens as the console, inverted for a light ground:
+
+| Role | Light | Dark (= console) |
+|---|---|---|
+| Ground | `#F7F4EF` | `#00324A` |
+| Type | `#00324A` | `#EBE9E8` |
+| Muted | `#85888C` | `#8DAAC9` |
+| Accent | `#F9B000` | `#F9B000` |
+
+The accent is identical on both grounds, so it survives the inversion unchanged.
+
+Statistics take a direction of travel from the same convention as the console:
+brand yellow for the positive figure, Costa dark amber `#C77706` for the negative.
+Alert `#C8503C` and signal `#3FA675` are used **once**, on slide 15, where the gap
+between 0% and 82% is the content rather than a decoration.
+
+Type is Poppins for prose and **IBM Plex Mono** for eyebrows, sources and figures.
+The mono is embedded rather than taken from a system stack: a system monospace
+renders differently on every machine, which would break the guarantee that the
+presenter sees what he rehearsed.

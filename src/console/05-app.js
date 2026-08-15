@@ -500,6 +500,18 @@ function doReset(){
   moveInstruments(false);
 }
 
+/* ── presentation bridge ───────────────────────────────────────────────────
+   When the console is embedded in the deck it announces itself, so the deck
+   knows the frame is live, and hands control back on Escape. Local-file
+   frames are cross-origin, which is why this goes over postMessage. Running
+   standalone, EMBEDDED is false and none of this does anything. */
+const EMBEDDED = (() => { try { return window.parent !== window; } catch (e) { return true; } })();
+
+function tellDeck(type){
+  if (!EMBEDDED) return;
+  try { window.parent.postMessage({ type }, '*'); } catch (e) {}
+}
+
 /* ── input ─────────────────────────────────────────────────────────────── */
 const NAV_KEYS = [' ', 'Spacebar', 'ArrowRight', 'ArrowLeft', 'PageDown', 'PageUp'];
 
@@ -512,6 +524,7 @@ document.addEventListener('keydown', e => {
   if (k === 'ArrowRight' || k === ' ' || k === 'Spacebar' || k === 'PageDown'){ advance(); return; }
   if (k === 'ArrowLeft'  || k === 'PageUp'){ back(); return; }
   if (k >= '1' && k <= '4'){ startClock(); choose(Number(k) - 1); return; }
+  if (k === 'Escape'){ tellDeck('broken-loop:return'); return; }
 
   switch (k.toLowerCase()){
     case 's': startClock(); skip(); break;
@@ -552,3 +565,4 @@ moveInstruments(false);
 tickClock();
 setInterval(tickClock, 1000);
 show('title');
+tellDeck('broken-loop:ready');

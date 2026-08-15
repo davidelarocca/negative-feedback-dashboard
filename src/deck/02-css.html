@@ -1,0 +1,189 @@
+
+/* ══════════════════════════════════════════════════════════════════════════
+   5. SLIDE CONTAINER
+   ══════════════════════════════════════════════════════════════════════════ */
+#slides{ position:absolute; inset:0; z-index:1; }
+.rail{ z-index:3; }
+.presenter{ z-index:3; }
+.notes{ z-index:5; }
+
+.slide{
+  position:absolute; inset:0;
+  padding:52px 72px 92px;
+  display:none; flex-direction:column;
+}
+.slide.is-active{ display:flex; }
+
+/* The five break-point slides give 52px of their height to the rail, so the
+   whole sequence tightens together. Headline size is deliberately untouched:
+   07 to 11 must read as one run. */
+.tight .gap-m{ gap:20px; }
+.tight .gap-s{ gap:14px; }
+.tight .body { font-size:24px; }
+
+/* Slides that carry more than the base scale fits in 720px step down one
+   density notch, rather than the whole deck shrinking to its worst case. */
+.dense .headline    { font-size:46px; }
+.dense .display     { font-size:42px; }
+.dense .lead        { font-size:26px; }
+.dense .body        { font-size:24px; }
+.dense .gap-l       { gap:26px; }
+.dense .gap-m       { gap:22px; }
+.dense .gap-s       { gap:14px; }
+.dense .data-row__v { font-size:40px; }
+.dense .quote       { font-size:36px; padding-left:26px; }
+.dense .pair        { gap:56px; }
+.dense .pair__n     { font-size:64px; }
+.dense .pair__l     { font-size:20px; max-width:250px; }
+
+/* content that steps aside once the argument has moved past it */
+[data-until]{ transition:opacity 420ms var(--ease-out); }
+[data-until].faded{ opacity:0; pointer-events:none; }
+@media (prefers-reduced-motion:reduce){ [data-until]{ transition:opacity .001ms; } }
+/* The rail bottoms out at 80px; 104 leaves it clear without spending the
+   whole top of the slide on it. */
+.slide.has-rail{ padding-top:104px; }
+.slide.is-center{ justify-content:center; align-items:flex-start; }
+
+/* vertical rhythm */
+.stack   { display:flex; flex-direction:column; }
+.gap-xs  { gap:12px; }  .gap-s{ gap:20px; }  .gap-m{ gap:32px; }
+.gap-l   { gap:48px; }  .gap-xl{ gap:64px; }
+.push    { margin-top:auto; }
+.mw-sm{ max-width:720px; }  .mw-md{ max-width:900px; }  .mw-lg{ max-width:1040px; }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   6. COMPONENTS
+   ══════════════════════════════════════════════════════════════════════════ */
+
+/* ── statistics ── the number is the hero ── */
+.stat{ display:flex; flex-direction:column; gap:10px; }
+.stat__n{ font-size:104px; }
+.stat__n--sm{ font-size:76px; }
+.stat__l{ font-size:24px; font-weight:300; line-height:1.4; color:var(--ink-soft); }
+.stats-row{ display:flex; gap:56px; align-items:flex-start; }
+.stats-row > *{ flex:1 1 0; min-width:0; }
+
+/* two panes divided by a drawn hairline */
+.split{ display:flex; gap:56px; align-items:stretch; }
+.split > .col{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; gap:20px; }
+.split > .divider{ flex:0 0 1px; align-self:stretch; }
+
+/* three columns divided by drawn hairlines */
+.cols3{ display:flex; gap:44px; align-items:stretch; }
+.cols3 > .col{ flex:1 1 0; min-width:0; display:flex; flex-direction:column; gap:16px; }
+.cols3 > .divider{ flex:0 0 1px; }
+.col__k{ font-size:34px; font-weight:600; letter-spacing:-.02em; }
+
+/* ── slide 05 · the cycle ── */
+.cycle{ display:flex; gap:14px; }
+.cycle__b{
+  flex:1 1 0; text-align:center;
+  border:1px solid var(--frame); border-radius:3px;
+  padding:20px 12px; font-size:24px; font-weight:400; letter-spacing:.01em;
+}
+
+/* ── slide 12 · the data row ── */
+.data-row{ display:flex; gap:0; align-items:flex-end; }
+.data-row__c{
+  flex:1 1 0; min-width:0;
+  display:flex; flex-direction:column; gap:8px; align-items:flex-start;
+  padding-right:16px;
+}
+/* Kept below the 52px operational conclusion: on slide 12 the takeaway
+   outweighs the data, not the other way round. */
+.data-row__v{ font-size:44px; }
+.data-row__k{
+  font-family:var(--mono); font-size:18px; letter-spacing:.04em;
+  color:var(--mute); white-space:nowrap;
+}
+
+/* ── slide 14 · the spiral ── */
+.spiral{ display:flex; gap:64px; align-items:center; }
+.spiral__svg{ flex:0 0 300px; width:300px; height:300px; }
+.spiral__steps{ flex:1 1 auto; display:flex; flex-direction:column; gap:18px; }
+.spiral__step{ display:flex; gap:18px; align-items:baseline; }
+.spiral__n{
+  font-family:var(--mono); font-size:18px; font-weight:600; color:var(--accent);
+  flex:0 0 auto; width:22px;
+}
+.spiral__t{ font-size:24px; font-weight:300; line-height:1.4; color:var(--ink-soft); }
+.sp-arc{
+  fill:none; stroke:var(--accent); stroke-width:5; stroke-linecap:round;
+  stroke-dasharray:176; stroke-dashoffset:176;
+  transition:stroke-dashoffset 520ms var(--ease-out);
+}
+[data-step].shown .sp-arc, .sp-arc[data-step].shown{ stroke-dashoffset:0; }
+.sp-node{ fill:var(--paper); stroke:var(--accent); stroke-width:4; }
+.sp-track{ fill:none; stroke:var(--frame); stroke-width:5; }
+@media (prefers-reduced-motion:reduce){ .sp-arc{ transition:none; stroke-dashoffset:0; } }
+
+/* ── slide 15 · the sentence ── */
+.quote{
+  font-size:44px; font-weight:300; line-height:1.3; letter-spacing:-.015em;
+  border-left:3px solid var(--accent); padding-left:32px;
+}
+.pair{ display:flex; gap:72px; align-items:flex-start; }
+.pair__c{ display:flex; flex-direction:column; gap:10px; }
+.pair__n{ font-size:96px; }
+.pair__l{ font-size:22px; font-weight:300; line-height:1.4; color:var(--ink-soft); max-width:280px; }
+
+/* ── slide 01 / 21 · the sentences ── */
+.said{ font-size:46px; font-weight:300; line-height:1.28; letter-spacing:-.02em; }
+.said--muted{ font-size:30px; color:var(--mute); }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   7. PRESENTER CHROME — part of the design, not an overlay on top of it
+   ══════════════════════════════════════════════════════════════════════════ */
+.presenter{
+  position:absolute; left:72px; bottom:40px;
+  display:flex; align-items:center; gap:18px;
+  font-family:var(--mono); font-size:18px; color:var(--mute);
+  letter-spacing:.06em; font-variant-numeric:tabular-nums;
+}
+.presenter__n b{ color:var(--ink); font-weight:600; }
+.presenter__n .of{ opacity:.6; }
+.presenter__tick{ width:1px; height:16px; background:var(--rule); }
+.presenter__hint{ opacity:.55; letter-spacing:.1em; }
+
+/* speaker notes — hidden by default */
+.notes{
+  position:absolute; left:0; right:0; bottom:0;
+  background:var(--paper);
+  border-top:1px solid var(--rule);
+  padding:26px 72px 30px;
+  transform:translateY(101%);
+  transition:transform 320ms var(--ease-out);
+  max-height:360px; overflow-y:auto;
+}
+.notes.on{ transform:none; }
+.notes__k{
+  font-family:var(--mono); font-size:18px; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--accent); margin-bottom:10px;
+}
+.notes__b{ font-size:22px; font-weight:300; line-height:1.5; color:var(--ink-soft); max-width:1040px; }
+.notes__b em{ color:var(--ink); font-style:italic; }
+@media (prefers-reduced-motion:reduce){ .notes{ transition:none; } }
+
+/* ══════════════════════════════════════════════════════════════════════════
+   8. THE HANDOFF
+   Full-bleed at real viewport size — the console has its own responsive
+   layout and must not be scaled inside the deck's 1280×720 canvas.
+   It sits on the console's own ground colour, which by the time it appears
+   is already the colour of the deck, so there is nothing to see happening.
+   ══════════════════════════════════════════════════════════════════════════ */
+.console{
+  position:fixed; inset:0; width:100%; height:100%;
+  border:0; background:#00324A;
+  opacity:0; pointer-events:none;
+  transition:opacity 420ms var(--ease-out);
+  z-index:40;
+}
+.console.on{ opacity:1; pointer-events:auto; }
+@media (prefers-reduced-motion:reduce){ .console{ transition:none; } }
+
+/* Shown instead of the frame when the console has to open in a new tab. */
+.fallback{ display:none; }
+.fallback.on{ display:block; }
+</style>
+</head>

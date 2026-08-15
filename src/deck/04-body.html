@@ -1,0 +1,36 @@
+<body>
+
+<div class="viewport">
+  <!-- Fixed 1280×720 design canvas, scaled to whatever screen turns up. -->
+  <div class="canvas" id="canvas">
+
+    <!-- the loop rail, slides 07 to 11 -->
+    <div class="rail" id="rail" aria-hidden="true"></div>
+
+    <div id="slides"></div>
+
+    <!-- presenter strip: part of the design, visible on the shared screen -->
+    <div class="presenter">
+      <span class="presenter__n"><b id="p-n">01</b><span class="of"> / 22</span></span>
+      <span class="presenter__tick"></span>
+      <span id="p-clock">00:00</span>
+      <span class="presenter__tick"></span>
+      <span class="presenter__hint" id="p-hint">N notes · F full screen</span>
+    </div>
+
+    <!-- speaker notes -->
+    <div class="notes" id="notes">
+      <div class="notes__k" id="notes-k">Slide 01</div>
+      <div class="notes__b" id="notes-b"></div>
+    </div>
+  </div>
+</div>
+
+<!--
+  The console, preloaded and hidden. It is full-bleed at real viewport size
+  rather than inside the scaled canvas, because it carries its own responsive
+  layout. Its background is the console's ground colour, which is the colour
+  the deck has already inverted to before this is ever revealed.
+-->
+<iframe class="console" id="console" title="Feedback Decision Console"
+        referrerpolicy="no-referrer"></iframe>

@@ -1,19 +1,24 @@
 #!/usr/bin/env python3
 """
-Assemble broken-loop.html — one self-contained, fully offline file.
+Build the two files of the session, each self-contained and fully offline.
 
-    python3 tools/build.py
+    python3 tools/build.py              # both
+    python3 tools/build.py console      # just the console
+    python3 tools/build.py deck         # just the deck
 
-Concatenates the parts in src/, then inlines the two binary brand assets as
-data URIs so the result has no external references of any kind:
+  broken-loop.html        the feedback decision console (dark)
+  broken-loop-deck.html   the 22-slide presentation that wraps around it (light)
 
-  * Poppins  — the Costa brand typeface, subset to Latin + Latin-Ext and
-               converted to WOFF2 (weights 300/400/600/700).
-  * The mark — the Costa "C", cropped to its content box and resized for a
-               high-DPI presentation screen.
+Both inline every asset as a data URI, so neither can be separated from what
+it needs by being emailed, zipped or copied to a ship's laptop. Each build
+fails if any external reference survives into the output.
 
-Regenerating the font subsets from the full TTFs needs fonttools + brotli;
-tools/subset-fonts.py does that and is only needed if the weights change.
+  Poppins        Costa brand face, subset to Latin + Latin-Ext (both files)
+  IBM Plex Mono  eyebrows, sources and figures (deck only)
+  The Costa mark cropped to its content box and resized (console only)
+
+Regenerating the font subsets needs fonttools + brotli; tools/subset-fonts.py
+does that and is only needed if the set of weights changes.
 """
 
 import base64
@@ -24,7 +29,7 @@ import sys
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 SRC = ROOT / "src"
-OUT = ROOT / "broken-loop.html"
+FONTS = ROOT / "assets" / "fonts"
 
 # The white + yellow mark reads correctly on the deep-blue console ground.
 # Matched by glob so a re-upload under a slightly different name still builds;
@@ -32,25 +37,32 @@ OUT = ROOT / "broken-loop.html"
 LOGO_GLOBS = ["c_full_white_yellow*.png", "c_full_white*.png", "c_full_yellow*.png"]
 LOGO_HEIGHT = 144          # 3x the 48px rendered height, for retina/projector
 
-FONTS = [
-    ("Poppins", 300, "Poppins-300.subset.woff2"),
-    ("Poppins", 400, "Poppins-400.subset.woff2"),
-    ("Poppins", 600, "Poppins-600.subset.woff2"),
-    ("Poppins", 700, "Poppins-700.subset.woff2"),
-]
+POPPINS = [("Poppins", w, f"Poppins-{w}.subset.woff2") for w in (300, 400, 600, 700)]
+PLEX = [("IBM Plex Mono", w, f"IBMPlexMono-{w}.subset.woff2") for w in (400, 600)]
 
-PARTS = [
-    "01-head.html",
-    "02-css.html",
-    "03-body.html",
-]
+TARGETS = {
+    "console": {
+        "out": "broken-loop.html",
+        "parts": ["01-head.html", "02-css.html", "03-body.html"],
+        "scripts": ["04-content.js", "05-app.js"],
+        "fonts": POPPINS,
+        "logo": True,
+    },
+    "deck": {
+        "out": "broken-loop-deck.html",
+        "parts": ["01-head.html", "02-css.html", "04-body.html"],
+        "scripts": ["03-slides.js", "05-app.js"],
+        "fonts": POPPINS + PLEX,
+        "logo": False,
+    },
+}
 
 
-def font_css() -> str:
+def font_css(fonts) -> str:
     """@font-face blocks with the WOFF2 payloads inlined as data URIs."""
     out = []
-    for family, weight, filename in FONTS:
-        path = ROOT / "assets" / "fonts" / filename
+    for family, weight, filename in fonts:
+        path = FONTS / filename
         if not path.exists():
             sys.exit(f"missing font: {path}\nrun tools/subset-fonts.py first")
         b64 = base64.b64encode(path.read_bytes()).decode("ascii")
@@ -82,7 +94,6 @@ def logo_data_uri() -> str:
     except ImportError:
         sys.exit("Pillow is required to embed the logo:  pip install pillow")
 
-    print(f"logo: {src.name}")
     im = Image.open(src).convert("RGBA")
     box = im.getchannel("A").getbbox()
     if box:
@@ -93,31 +104,49 @@ def logo_data_uri() -> str:
 
     buf = io.BytesIO()
     im.save(buf, format="PNG", optimize=True)
-    b64 = base64.b64encode(buf.getvalue()).decode("ascii")
-    return f"data:image/png;base64,{b64}"
+    return "data:image/png;base64," + base64.b64encode(buf.getvalue()).decode("ascii")
+
+
+def check_offline(html: str, name: str) -> None:
+    """Nothing may reach outside the file. The console is the one allowed
+    reference, because the deck loads it from the same folder on purpose."""
+    leaks = re.findall(r'(?:src|href)\s*=\s*["\'](?!data:|#)([^"\']+)', html)
+    leaks += re.findall(r'url\(\s*(?!["\']?data:)([^)]+)\)', html)
+    leaks = [x for x in leaks if x != TARGETS["console"]["out"]]
+    if leaks:
+        sys.exit(f"{name}: external reference(s) left in the build: " + ", ".join(sorted(set(leaks))))
+
+
+def build(name: str) -> None:
+    cfg = TARGETS[name]
+    src = SRC / name
+
+    html = "".join((src / p).read_text(encoding="utf-8") for p in cfg["parts"])
+    js = "\n".join((src / s).read_text(encoding="utf-8") for s in cfg["scripts"])
+    html += "\n<script>\n" + js + "\n</script>\n</body>\n</html>\n"
+
+    subs = {"/*__FONTS__*/": font_css(cfg["fonts"])}
+    if cfg["logo"]:
+        subs["/*__LOGO__*/"] = logo_data_uri()
+
+    for token, value in subs.items():
+        if token not in html:
+            sys.exit(f"{name}: token {token} not found in src/{name}/")
+        html = html.replace(token, value)
+
+    check_offline(html, name)
+
+    out = ROOT / cfg["out"]
+    out.write_text(html, encoding="utf-8")
+    print(f"built {out.name:<24} {out.stat().st_size / 1024:>6.0f} KB")
 
 
 def main() -> None:
-    html = "".join((SRC / p).read_text(encoding="utf-8") for p in PARTS)
-
-    js = "\n".join(
-        (SRC / p).read_text(encoding="utf-8") for p in ("04-content.js", "05-app.js")
-    )
-    html += "\n<script>\n" + js + "\n</script>\n</body>\n</html>\n"
-
-    for token, value in (("/*__FONTS__*/", font_css()), ("/*__LOGO__*/", logo_data_uri())):
-        if token not in html:
-            sys.exit(f"token {token} not found in src/")
-        html = html.replace(token, value)
-
-    # Nothing may reach outside the file.
-    leaks = re.findall(r'(?:src|href)\s*=\s*["\'](?!data:|#)([^"\']+)', html)
-    leaks += re.findall(r'url\(\s*(?!["\']?data:)([^)]+)\)', html)
-    if leaks:
-        sys.exit("external reference(s) left in the build: " + ", ".join(sorted(set(leaks))))
-
-    OUT.write_text(html, encoding="utf-8")
-    print(f"built {OUT.relative_to(ROOT)}  ({OUT.stat().st_size / 1024:.0f} KB)")
+    wanted = sys.argv[1:] or list(TARGETS)
+    for name in wanted:
+        if name not in TARGETS:
+            sys.exit(f"unknown target {name!r}; expected one of: {', '.join(TARGETS)}")
+        build(name)
 
 
 if __name__ == "__main__":
