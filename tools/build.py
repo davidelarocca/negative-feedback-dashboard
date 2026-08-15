@@ -6,8 +6,9 @@ Build the two files of the session, each self-contained and fully offline.
     python3 tools/build.py console      # just the console
     python3 tools/build.py deck         # just the deck
 
-  broken-loop.html        the feedback management dashboard (dark)
-  broken-loop-deck.html   the 25-slide presentation that wraps around it (light)
+  broken-loop-session.html  BOTH halves in one file — the version to present
+  broken-loop.html          the feedback management dashboard on its own (dark)
+  broken-loop-deck.html     the deck on its own, loading the dashboard beside it
 
 Both inline every asset as a data URI, so neither can be separated from what
 it needs by being emailed, zipped or copied to a ship's laptop. Each build
@@ -53,6 +54,19 @@ TARGETS = {
         "scripts": ["03-slides.js", "05-app.js"],
         "fonts": POPPINS,
         "logo": False,
+    },
+    # The whole session in one file: the deck with the dashboard carried
+    # inside it, handed to a srcdoc frame at the handoff. Same deck source as
+    # above — only the token differs.
+    "session": {
+        "out": "broken-loop-session.html",
+        "src": "deck",
+        "parts": ["01-head.html", "02-css.html", "04-body.html"],
+        "scripts": ["03-slides.js", "05-app.js"],
+        "fonts": POPPINS,
+        "logo": False,
+        "embed_dashboard": True,
+        "title": "The Broken Loop",
     },
 }
 
@@ -116,9 +130,10 @@ def check_offline(html: str, name: str) -> None:
         sys.exit(f"{name}: external reference(s) left in the build: " + ", ".join(sorted(set(leaks))))
 
 
-def build(name: str) -> None:
+def render(name: str) -> str:
+    """Assemble one target and return its HTML."""
     cfg = TARGETS[name]
-    src = SRC / name
+    src = SRC / cfg.get("src", name)
 
     html = "".join((src / p).read_text(encoding="utf-8") for p in cfg["parts"])
     js = "\n".join((src / s).read_text(encoding="utf-8") for s in cfg["scripts"])
@@ -130,14 +145,30 @@ def build(name: str) -> None:
 
     for token, value in subs.items():
         if token not in html:
-            sys.exit(f"{name}: token {token} not found in src/{name}/")
+            sys.exit(f"{name}: token {token} not found in {src}")
         html = html.replace(token, value)
 
-    check_offline(html, name)
+    # The deck carries a placeholder for an embedded dashboard. The one-file
+    # build fills it; the others empty it so the frame loads the sibling file.
+    if "__DASHBOARD_B64__" in html:
+        payload = ""
+        if cfg.get("embed_dashboard"):
+            dashboard = render("console")
+            payload = base64.b64encode(dashboard.encode("utf-8")).decode("ascii")
+        html = html.replace("__DASHBOARD_B64__", payload)
 
-    out = ROOT / cfg["out"]
+    if cfg.get("title"):
+        html = re.sub(r"<title>.*?</title>", f"<title>{cfg['title']}</title>", html, count=1)
+
+    check_offline(html, name)
+    return html
+
+
+def build(name: str) -> None:
+    html = render(name)
+    out = ROOT / TARGETS[name]["out"]
     out.write_text(html, encoding="utf-8")
-    print(f"built {out.name:<24} {out.stat().st_size / 1024:>6.0f} KB")
+    print(f"built {out.name:<26} {out.stat().st_size / 1024:>6.0f} KB")
 
 
 def main() -> None:

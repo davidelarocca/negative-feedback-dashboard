@@ -4,20 +4,32 @@ A 15-minute leadership training on delivering negative feedback, aboard a Costa
 Cruises ship. Audience: Directors and Heads of Department. Delivered fullscreen
 over a video call, driven entirely from the keyboard.
 
-Two files, two halves of one session:
+## Open `broken-loop-session.html`
+
+**That one file is the whole session.** The 25-slide deck and the Feedback
+Management Dashboard are inside it, so the presentation runs start to finish
+without ever leaving the page or opening a second file. Double-click it, press
+`F` for full screen, and drive it from the keyboard.
+
+The presenter runs the deck to slide 20, the dashboard takes over in place,
+the room plays the eight cases out loud, `Esc` hands back, and the deck picks
+up at slide 21.
+
+The two halves are also built separately, for editing one without the other or
+for sending just the dashboard to someone:
 
 | File | Ground | Role |
 |---|---|---|
-| `broken-loop-deck.html` | light | 25 slides. Carries the argument. |
-| `broken-loop.html` | dark | The Feedback Management Dashboard. The checkpoint in the middle of it. |
+| **`broken-loop-session.html`** | both | **The whole session in one file. Present this.** |
+| `broken-loop-deck.html` | light | The deck alone. Needs `broken-loop.html` beside it. |
+| `broken-loop.html` | dark | The dashboard alone. Fully standalone. |
 
-The presenter runs the deck to slide 20, hands over to the dashboard, plays the
-eight cases with the room answering out loud, and returns to the deck at slide 21.
+The contrast between the two halves is load-bearing: the light ground is the
+argument, the dark ground is where the room stops listening and starts
+deciding.
 
-The contrast between the two is load-bearing: the light ground is the argument,
-the dark ground is where the room stops listening and starts deciding. They do
-not match in tone. They match in system — same palette, same type, same spacing
-rhythm, inverted.
+They do not match in tone. They match in system — same palette, same type, same
+spacing rhythm, inverted.
 
 ---
 
@@ -163,7 +175,8 @@ logic in `src/console/05-app.js` contains no training text. Change a case, then
 rebuild:
 
 ```
-python3 tools/build.py          # both files
+python3 tools/build.py          # all three
+python3 tools/build.py session  # just the one-file session
 python3 tools/build.py console  # just the dashboard
 python3 tools/build.py deck     # just the deck
 
@@ -201,8 +214,9 @@ session, change `min` values — the fastest path recomputes itself.
 ### Files
 
 ```
-broken-loop.html            ← GENERATED, self-contained. Open and share this.
-broken-loop-deck.html       ← GENERATED, self-contained. The presentation.
+broken-loop-session.html    ← GENERATED. The whole session in one file. Present this.
+broken-loop.html            ← GENERATED. The dashboard on its own.
+broken-loop-deck.html       ← GENERATED. The deck on its own.
 
 src/console/01-head.html       tokens, brand type rules, shell, instrument rail
 src/console/02-css.html        screens, options, summary, responsive
@@ -278,8 +292,14 @@ for the heaviest standalone slides.
 
 ## 10. The handoff
 
-Slide 20 hands over to the dashboard, preferring the embedded route so the
-presenter never leaves the deck:
+Slide 20 hands over to the dashboard. In `broken-loop-session.html` the whole
+dashboard travels inside the deck as a base64 payload and is handed to a
+`srcdoc` frame, so nothing is ever fetched — the frame reports `about:srcdoc`,
+which is what the suite asserts. In the two-file build the same code loads
+`broken-loop.html` from beside it instead. One deck source, both outputs.
+
+Either way the embedded route is preferred so the presenter never leaves the
+deck:
 
 1. The console is preloaded into a hidden full-bleed iframe when the deck opens,
    so there is nothing left to load at the handoff.

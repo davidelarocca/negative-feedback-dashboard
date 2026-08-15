@@ -104,7 +104,7 @@ const SLIDES = [
 { n:'07', cls:'tight', rail:1, steps:4, html:`
   <p class="eyebrow" data-step="0">Break point 01 · Respect &amp; Protect</p>
   <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">The moment.</h2>
-  <div class="stack gap-m" style="margin-top:34px">
+  <div class="stack gap-m" style="margin-top:22px">
     <p class="body mw-lg" data-step="1">Where, when, and in front of whom. Criticise the behaviour and you get repair. Criticise the person and you get defence.</p>
     <div class="stats-row">
       <div class="stat lift" data-step="2" style="--i:0">

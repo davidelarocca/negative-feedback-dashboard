@@ -18,6 +18,7 @@ import path from 'node:path';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '..');
 const DASH = 'file://' + path.join(ROOT, 'broken-loop.html');
 const DECK = 'file://' + path.join(ROOT, 'broken-loop-deck.html');
+const SESSION = 'file://' + path.join(ROOT, 'broken-loop-session.html');
 
 const SIZES = [[1920, 1080], [1600, 900], [1440, 900], [1366, 768], [1280, 800]];
 
@@ -172,6 +173,8 @@ console.log('\nDECK');
 
   const meta = await p.evaluate(() => ({
     fonts: [...new Set([...document.fonts].map(f => f.family))],
+    loaded: document.fonts.status === 'loaded'
+      && document.fonts.check('300 16px Poppins') && document.fonts.check('700 16px Poppins'),
     total: document.getElementById('p-total').textContent,
     transform: document.getElementById('canvas').style.transform,
     strip: document.querySelector('.presenter').textContent.replace(/\s+/g, ' ').trim(),
@@ -179,6 +182,7 @@ console.log('\nDECK');
     words: document.querySelectorAll('.w').length
   }));
   check('Poppins is the only typeface', meta.fonts.length === 1 && meta.fonts[0] === 'Poppins', meta.fonts.join(','));
+  check('Poppins actually loaded, so line breaks are the designed ones', meta.loaded);
   check('25 slides', meta.total === '25', meta.total);
   check('canvas scales exactly 1.5x at 1920', meta.transform.includes('scale(1.5)'), meta.transform);
   check('presenter strip carries no key hints', !/notes|full screen/i.test(meta.strip), meta.strip);
@@ -201,6 +205,7 @@ console.log('\nDECK · every slide fits 1280x720');
     const el = document.querySelector('.slide.is-active');
     const cs = getComputedStyle(el), r = el.getBoundingClientRect();
     const bottom = r.bottom - parseFloat(cs.paddingBottom);
+    const stripTop = document.querySelector('.presenter').getBoundingClientRect().top;
     let over = 0, who = '', tiny = Infinity;
     el.querySelectorAll('*').forEach(n => {
       const q = n.getBoundingClientRect();
@@ -219,6 +224,7 @@ console.log('\nDECK · every slide fits 1280x720');
     return {
       slide: document.getElementById('p-n').textContent,
       over: Math.round(over), who, tiny,
+      clearance: Math.round(stripTop - bottom),
       rail: document.getElementById('rail').classList.contains('on')
         ? [...document.querySelectorAll('.rail__seg')].map(s =>
             s.classList.contains('is-now') ? 'N' : s.classList.contains('is-past') ? 'p' : '.').join('')
@@ -240,7 +246,12 @@ console.log('\nDECK · every slide fits 1280x720');
     }
     const fin = await probe();
     if (fin.console) { await press(p, 'Escape', 350); continue; }
-    check(`slide ${fin.slide} fits`, fin.over <= 1, `+${fin.over}px "${fin.who}"`);
+    /* Half the gap between the content box and the presenter strip: text
+       stays visibly clear of the strip, and a word of shaping difference
+       between browser builds does not fail a slide that looks right. */
+    const budget = Math.max(1, Math.floor(fin.clearance / 2));
+    check(`slide ${fin.slide} fits`, fin.over <= budget,
+      `+${fin.over}px over a ${budget}px budget "${fin.who}"`);
     if (fin.rail !== 'off') rails[fin.slide] = fin.rail;
     worstType = Math.min(worstType, fin.tiny);
     await press(p, 'ArrowRight', 220);
@@ -290,6 +301,55 @@ console.log('\nHANDOFF');
     check('the return slide inverts back to light on its first step', light);
   }
   check('handoff makes no external request', p.external.length === 0, p.external.join(','));
+  await p.close();
+}
+
+/* ══════════════════════════════════════════════════════════════════════════
+   4. THE ONE-FILE SESSION — the version that actually gets presented
+   ══════════════════════════════════════════════════════════════════════════ */
+console.log('\nONE FILE');
+{
+  const p = await open(SESSION, { width: 1920, height: 1080 });
+  check('one file, 25 slides', await p.evaluate(() => document.getElementById('p-total').textContent) === '25');
+
+  for (let g = 0; g < 220; g++) {
+    if (await p.evaluate(() => document.getElementById('console').classList.contains('on'))) break;
+    await press(p, 'ArrowRight', 110);
+  }
+  await p.waitForTimeout(900);
+
+  const frame = p.frames().find(f => f !== p.mainFrame());
+  check('the dashboard is carried inside the page', !!frame && frame.url().startsWith('about:srcdoc'),
+    frame ? frame.url().slice(0, 40) : 'no frame');
+
+  if (frame) {
+    /* A srcdoc frame proves self-containment: nothing was fetched from a
+       sibling file, so the one file is the whole session. */
+    const header = await frame.evaluate(() => document.querySelector('.lockup__text').textContent.trim());
+    check('the embedded dashboard is the real one', header.startsWith('Feedback Management Dashboard'), header);
+    check('its fonts came with it', await frame.evaluate(() => document.fonts.check('300 16px Poppins')));
+
+    const deckBg = await p.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    const dashBg = await frame.evaluate(() => getComputedStyle(document.body).backgroundColor);
+    check('the grounds still match exactly', deckBg === dashBg, `${deckBg} vs ${dashBg}`);
+
+    await frame.evaluate(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true })));
+    await p.waitForTimeout(220);
+    await frame.evaluate(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: '1', bubbles: true })));
+    await p.waitForTimeout(950);
+    const mins = await frame.evaluate(() => document.getElementById('r-minutes').textContent);
+    check('decisions record inside the embedded dashboard', mins !== '0', mins);
+
+    await frame.evaluate(() => document.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true })));
+    await p.waitForTimeout(550);
+    const back = await p.evaluate(() => ({
+      dark: document.body.classList.contains('is-dark'),
+      gone: !document.getElementById('console').classList.contains('on')
+    }));
+    check('Esc hands back to the deck', back.gone && back.dark, JSON.stringify(back));
+  }
+  check('one file makes no external request', p.external.length === 0, p.external.join(','));
+  check('one file runs without errors', p.errors.length === 0, p.errors.join(' | '));
   await p.close();
 }
 

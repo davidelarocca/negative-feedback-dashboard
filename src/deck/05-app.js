@@ -8,6 +8,18 @@ const $ = id => document.getElementById(id);
 const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 const CONSOLE_FILE = 'broken-loop.html';
+
+/* In the single-file build this holds the whole dashboard, base64 encoded,
+   and the frame is fed from it instead of from a sibling file. In the
+   two-file build it is empty and the frame loads broken-loop.html. One
+   source, both outputs. */
+const DASHBOARD_B64 = '__DASHBOARD_B64__';
+
+function dashboardHtml(){
+  if (!DASHBOARD_B64) return null;
+  const bytes = Uint8Array.from(atob(DASHBOARD_B64), c => c.charCodeAt(0));
+  return new TextDecoder('utf-8').decode(bytes);   /* the copy is UTF-8 */
+}
 const INVERT_MS = 700;
 const WORD_MS = 46;        /* per-word delay in a kinetic split */
 
@@ -264,9 +276,15 @@ function handoff(){
     setTimeout(() => { try { frame.contentWindow.focus(); } catch (err) {} }, 80);
   } else {
     /* The frame never announced itself, so it is not usable. Open the
-       dashboard in a tab rather than leaving a dead frame on screen. */
+       dashboard in a tab rather than leaving a dead frame on screen. In the
+       single-file build there is no sibling file to open, so it goes out as
+       a blob built from the copy carried inside this page. */
     consoleMode = 'tab';
-    const win = window.open(CONSOLE_FILE, '_blank');
+    const html = dashboardHtml();
+    const target = html
+      ? URL.createObjectURL(new Blob([html], { type: 'text/html' }))
+      : CONSOLE_FILE;
+    const win = window.open(target, '_blank');
     if (!win){
       const note = $('handoff-fallback');
       if (note) note.classList.add('on');
@@ -356,4 +374,8 @@ $('canvas').addEventListener('click', e => {
 build();
 fit();
 render(false);
-$('console').src = CONSOLE_FILE;
+
+/* Preload the dashboard so the handoff has nothing left to load. */
+const embedded = dashboardHtml();
+if (embedded) $('console').srcdoc = embedded;
+else $('console').src = CONSOLE_FILE;
