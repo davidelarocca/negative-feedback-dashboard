@@ -16,9 +16,9 @@ const SLIDES = [
 { n:'01', rail:0, steps:4, center:true, html:`
   <div class="stack gap-l">
     <div class="stack gap-m">
-      <p class="said" data-step="1">“Do you even know what you’re doing?”</p>
-      <p class="said" data-step="2">“How many times do I have to tell you this?”</p>
-      <p class="said" data-step="3">“Never mind. I’ll do it myself.”</p>
+      <p class="said" data-split="words" data-step="1">“Do you even know what you’re doing?”</p>
+      <p class="said" data-split="words" data-step="2">“How many times do I have to tell you this?”</p>
+      <p class="said" data-split="words" data-step="3">“Never mind. I’ll do it myself.”</p>
     </div>
     <div class="stack gap-s mw-lg" data-step="4">
       <div class="rule"></div>
@@ -30,8 +30,8 @@ const SLIDES = [
 /* ── 02 ─────────────────────────────────────────────────────────────────── */
 { n:'02', rail:0, steps:2, center:true, html:`
   <div class="stack gap-m mw-lg">
-    <p class="display" data-step="1">This is not a session about being nice.</p>
-    <p class="display" data-step="2">It is about the quality of the information you make decisions on.</p>
+    <p class="display" data-split="words" data-step="1">This is not a session about being nice.</p>
+    <p class="display" data-split="words" data-step="2">It is about the quality of the information you make decisions on.</p>
   </div>`,
   notes:`Flat, no smile. This buys you the room before they finish deciding it is thirty minutes of soft skills.` },
 
@@ -52,14 +52,14 @@ const SLIDES = [
   <div class="stack gap-l" style="margin-top:44px">
     <div class="stats-row">
       <div class="stack gap-s">
-        <div class="stat" data-step="1">
+        <div class="stat lift" data-step="1">
           <span class="stat__n fig down" data-count="38" data-suffix="%">0%</span>
           <span class="stat__l">of feedback interventions made performance worse</span>
         </div>
         <p class="src" data-step="2">Kluger &amp; DeNisi · Psychological Bulletin, 1996 · 131 experiments, 607 effect sizes, 23,663 observations · average effect positive at d&nbsp;=&nbsp;0.41</p>
       </div>
       <div class="stack gap-s">
-        <div class="stat" data-step="3">
+        <div class="stat lift" data-step="3">
           <span class="stat__n fig accent" data-count="72" data-suffix="%">0%</span>
           <span class="stat__l">of employees believe their performance would improve if their manager gave them corrective feedback</span>
         </div>
@@ -78,11 +78,11 @@ const SLIDES = [
   <p class="eyebrow" data-step="0">Our continuous improvement cycle</p>
   <div class="stack gap-l" style="margin-top:44px">
     <div class="cycle">
-      <div class="cycle__b" data-step="1" style="--i:0">Plan</div>
-      <div class="cycle__b" data-step="1" style="--i:1">Execute</div>
-      <div class="cycle__b" data-step="1" style="--i:2">Measure</div>
-      <div class="cycle__b" data-step="1" style="--i:3">Learn</div>
-      <div class="cycle__b" data-step="1" style="--i:4">Adjust</div>
+      <div class="cycle__b lift" data-step="1" style="--i:0">Plan</div>
+      <div class="cycle__b lift" data-step="1" style="--i:1">Execute</div>
+      <div class="cycle__b lift" data-step="1" style="--i:2">Measure</div>
+      <div class="cycle__b lift" data-step="1" style="--i:3">Learn</div>
+      <div class="cycle__b lift" data-step="1" style="--i:4">Adjust</div>
     </div>
     <p class="display mw-lg" data-step="2">The cycle only closes if somebody says that something did not work.</p>
     <div class="stack gap-s mw-lg" data-step="3">
@@ -107,15 +107,15 @@ const SLIDES = [
   <div class="stack gap-m" style="margin-top:34px">
     <p class="body mw-lg" data-step="1">Where, when, and in front of whom. Criticise the behaviour and you get repair. Criticise the person and you get defence.</p>
     <div class="stats-row">
-      <div class="stat" data-step="2" style="--i:0">
+      <div class="stat lift" data-step="2" style="--i:0">
         <span class="stat__n stat__n--sm fig down" data-count="48" data-suffix="%">0%</span>
         <span class="stat__l">deliberately reduced their effort</span>
       </div>
-      <div class="stat" data-step="2" style="--i:1">
+      <div class="stat lift" data-step="2" style="--i:1">
         <span class="stat__n stat__n--sm fig down" data-count="38" data-suffix="%">0%</span>
         <span class="stat__l">deliberately reduced the quality of their work</span>
       </div>
-      <div class="stat" data-step="2" style="--i:2">
+      <div class="stat lift" data-step="2" style="--i:2">
         <span class="stat__n stat__n--sm fig down" data-count="25" data-suffix="%">0%</span>
         <span class="stat__l">admitted taking their frustration out on customers</span>
       </div>
@@ -203,14 +203,14 @@ const SLIDES = [
     <div class="stack gap-s">
       <p class="eyebrow" data-step="1">Power Distance Index — the expectation that hierarchy is fixed and unquestioned</p>
       <div class="data-row">
-        <div class="data-row__c" data-step="1" style="--i:0"><span class="data-row__v fig" data-count="94">0</span><span class="data-row__k">Philippines</span></div>
-        <div class="data-row__c" data-step="1" style="--i:1"><span class="data-row__v fig" data-count="81">0</span><span class="data-row__k">Mexico</span></div>
-        <div class="data-row__c" data-step="1" style="--i:2"><span class="data-row__v fig" data-count="78">0</span><span class="data-row__k">Indonesia</span></div>
-        <div class="data-row__c" data-step="1" style="--i:3"><span class="data-row__v fig" data-count="77">0</span><span class="data-row__k">India</span></div>
-        <div class="data-row__c" data-step="1" style="--i:4"><span class="data-row__v fig" data-count="69">0</span><span class="data-row__k">Brazil</span></div>
-        <div class="data-row__c" data-step="1" style="--i:5"><span class="data-row__v fig" data-count="67">0</span><span class="data-row__k">Colombia</span></div>
-        <div class="data-row__c" data-step="1" style="--i:6"><span class="data-row__v fig" data-count="64">0</span><span class="data-row__k">Peru</span></div>
-        <div class="data-row__c" data-step="1" style="--i:7"><span class="data-row__v fig" data-count="50">0</span><span class="data-row__k">Italy</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:0"><span class="data-row__v fig" data-count="94">0</span><span class="data-row__k">Philippines</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:1"><span class="data-row__v fig" data-count="81">0</span><span class="data-row__k">Mexico</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:2"><span class="data-row__v fig" data-count="78">0</span><span class="data-row__k">Indonesia</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:3"><span class="data-row__v fig" data-count="77">0</span><span class="data-row__k">India</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:4"><span class="data-row__v fig" data-count="69">0</span><span class="data-row__k">Brazil</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:5"><span class="data-row__v fig" data-count="67">0</span><span class="data-row__k">Colombia</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:6"><span class="data-row__v fig" data-count="64">0</span><span class="data-row__k">Peru</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:7"><span class="data-row__v fig" data-count="50">0</span><span class="data-row__k">Italy</span></div>
       </div>
     </div>
     <p class="src" data-step="2">Hofstede · national averages from employee survey data · a description of populations, not of the person in front of you</p>
@@ -255,11 +255,11 @@ const SLIDES = [
       <circle class="sp-node" data-step="5" cx="36.87" cy="126.74" r="7"/>
     </svg>
     <div class="spiral__steps">
-      <div class="spiral__step" data-step="1"><span class="spiral__n">01</span><span class="spiral__t">Something goes wrong once.</span></div>
-      <div class="spiral__step" data-step="2"><span class="spiral__n">02</span><span class="spiral__t">You quietly downgrade your expectation of them.</span></div>
-      <div class="spiral__step" data-step="3"><span class="spiral__n">03</span><span class="spiral__t">You monitor more closely and delegate less.</span></div>
-      <div class="spiral__step" data-step="4"><span class="spiral__n">04</span><span class="spiral__t">They sense the loss of confidence, withdraw, and stop volunteering.</span></div>
-      <div class="spiral__step" data-step="5"><span class="spiral__n">05</span><span class="spiral__t">You read the withdrawal as proof you were right.</span></div>
+      <div class="spiral__step lift" data-step="1"><span class="spiral__n">01</span><span class="spiral__t">Something goes wrong once.</span></div>
+      <div class="spiral__step lift" data-step="2"><span class="spiral__n">02</span><span class="spiral__t">You quietly downgrade your expectation of them.</span></div>
+      <div class="spiral__step lift" data-step="3"><span class="spiral__n">03</span><span class="spiral__t">You monitor more closely and delegate less.</span></div>
+      <div class="spiral__step lift" data-step="4"><span class="spiral__n">04</span><span class="spiral__t">They sense the loss of confidence, withdraw, and stop volunteering.</span></div>
+      <div class="spiral__step lift" data-step="5"><span class="spiral__n">05</span><span class="spiral__t">You read the withdrawal as proof you were right.</span></div>
     </div>
   </div>
   <div class="stack gap-s push">
@@ -278,15 +278,15 @@ const SLIDES = [
       <span class="fig" data-count="27" data-suffix="%" style="font-size:1.1em">0%</span> to
       <span class="fig" data-count="64" data-suffix="%" style="font-size:1.1em">0%</span>.</p>
     <div class="pair" data-step="3">
-      <div class="pair__c">
+      <div class="pair__c lift">
         <span class="pair__n fig" style="color:var(--alert)" data-count="0" data-suffix="%">0%</span>
         <span class="pair__l">revised without the sentence</span>
       </div>
-      <div class="pair__c">
+      <div class="pair__c lift">
         <span class="pair__n fig" style="color:var(--signal)" data-count="82" data-suffix="%">0%</span>
         <span class="pair__l">revised with it</span>
       </div>
-      <div class="pair__c" style="justify-content:flex-end">
+      <div class="pair__c lift" style="justify-content:flex-end">
         <span class="pair__l" style="max-width:240px">among those who trusted the institution least</span>
       </div>
     </div>
@@ -336,8 +336,100 @@ const SLIDES = [
   notes:`One line, then move. Do not defend it.` },
 
 /* ── 18 ─────────────────────────────────────────────────────────────────── */
+/* ── 18 · NEW — what the dashboard measures ───────────────────────────────── */
+{ n:'18', rail:0, steps:2, html:`
+  <p class="eyebrow" data-step="0">What the dashboard measures</p>
+  <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">Three instruments.</h2>
+  <div class="stack gap-l" style="margin-top:38px">
+    <div class="instr">
+      <div class="instr__c lift" data-step="1" style="--i:0">
+        <div class="instr__top">
+          <svg class="instr__dial" viewBox="0 0 66 38" aria-hidden="true">
+            <path class="dial-track" d="M 7.6 24.8 A 27 27 0 0 1 58.4 24.8"/>
+            <path class="dial-live"  d="M 33 7 A 27 27 0 0 0 16.4 12.7"/>
+            <line class="dial-needle" x1="33" y1="34" x2="19.5" y2="16.7"/>
+          </svg>
+          <span class="instr__k">Trust</span>
+        </div>
+        <p class="instr__d">What the conversation costs the person in front of you.</p>
+        <p class="instr__tie">Held or lost at <b>Respect &amp; Protect</b> and <b>Better Together</b> — the moment, and who was watching.</p>
+      </div>
+      <div class="instr__c lift" data-step="1" style="--i:1">
+        <div class="instr__top">
+          <svg class="instr__dial" viewBox="0 0 66 38" aria-hidden="true">
+            <path class="dial-track" d="M 7.6 24.8 A 27 27 0 0 1 58.4 24.8"/>
+            <path class="dial-live"  d="M 33 7 A 27 27 0 0 1 36.8 7.3"/>
+            <line class="dial-needle" x1="33" y1="34" x2="36.1" y2="12.2"/>
+          </svg>
+          <span class="instr__k">Signal</span>
+        </div>
+        <p class="instr__d">Whether that person brings you the next problem.</p>
+        <p class="instr__tie">Held or lost at <b>Speak Up</b> — the consequence. When signal falls, the data stops arriving before the problem does.</p>
+      </div>
+      <div class="instr__c lift" data-step="1" style="--i:2">
+        <div class="instr__top">
+          <svg class="instr__dial" viewBox="0 0 66 38" aria-hidden="true">
+            <path class="dial-track" d="M 7.6 24.8 A 27 27 0 0 1 58.4 24.8"/>
+            <path class="dial-live"  d="M 33 7 A 27 27 0 0 1 52.1 14.9"/>
+            <line class="dial-needle" x1="33" y1="34" x2="48.6" y2="18.4"/>
+          </svg>
+          <span class="instr__k">Standard</span>
+        </div>
+        <p class="instr__d">Whether the behaviour actually changes.</p>
+        <p class="instr__tie">Held or lost at <b>Listen &amp; Learn</b> and <b>Always Improving</b> — the diagnosis, and what you adjust on afterwards.</p>
+      </div>
+    </div>
+    <div class="stack gap-s push" data-step="2">
+      <div class="rule"></div>
+      <p class="lead accent">The five values tell you where the loop breaks. These three tell you what the break cost.</p>
+    </div>
+  </div>`,
+  notes:`Twenty seconds. They are about to move these three by hand, so name them now. The point to land: <em>these are not scores. They are three different things a single sentence does at the same time.</em>` },
+
+/* ── 19 · NEW — the trade ─────────────────────────────────────────────────── */
+{ n:'19', rail:0, cls:'dense', steps:3, html:`
+  <p class="eyebrow" data-step="0">The trade</p>
+  <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">No move takes all three up for free.</h2>
+  <div class="stack gap-m" style="margin-top:34px">
+    <div class="trade">
+      <div class="trade__r lift" data-step="1" style="--i:0">
+        <span class="trade__n">Correct it on the spot, in front of the section</span>
+        <span class="trade__marks">
+          <span class="mk mk--down"><span class="mk__k">Trust</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
+          <span class="mk mk--down"><span class="mk__k">Signal</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
+          <span class="mk mk--up"><span class="mk__k">Standard</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
+        </span>
+        <span class="trade__t">1 min</span>
+      </div>
+      <div class="trade__r lift" data-step="1" style="--i:1">
+        <span class="trade__n">Say nothing, and quietly fix it yourself</span>
+        <span class="trade__marks">
+          <span class="mk mk--flat"><span class="mk__k">Trust</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
+          <span class="mk mk--flat"><span class="mk__k">Signal</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
+          <span class="mk mk--down"><span class="mk__k">Standard</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
+        </span>
+        <span class="trade__t">0 min</span>
+      </div>
+      <div class="trade__r lift" data-step="1" style="--i:2">
+        <span class="trade__n">Ask first, then agree one change and a date</span>
+        <span class="trade__marks">
+          <span class="mk mk--up"><span class="mk__k">Trust</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
+          <span class="mk mk--up"><span class="mk__k">Signal</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
+          <span class="mk mk--up"><span class="mk__k">Standard</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
+        </span>
+        <span class="trade__t">6 min</span>
+      </div>
+    </div>
+    <p class="body mw-lg" data-step="2">Only the third one moves all three. It is also the only one that costs you anything.</p>
+    <div class="stack gap-s push" data-step="3">
+      <div class="rule"></div>
+      <p class="lead accent">That is the whole trade. You are about to make it eight times.</p>
+    </div>
+  </div>`,
+  notes:`Do not explain the dashboard mechanics beyond this. They will learn the rest by using it. The sentence that matters: <em>the fast option and the good option are different options.</em>` },
+
 /* Step 2 is the handoff itself: nothing is revealed, the console takes over. */
-{ n:'18', rail:0, steps:2, center:true, handoffAt:2, html:`
+{ n:'20', rail:0, steps:2, center:true, handoffAt:2, html:`
   <div class="stack gap-l">
     <p class="eyebrow" data-step="0">Now it is your turn</p>
     <div class="stack gap-m">
@@ -349,7 +441,7 @@ const SLIDES = [
   notes:`Advance once more and the console takes over — the screen is already its colour. Read each case, take the room’s answer out loud, register it, move on. Open discussion only where the room splits. <em>Esc brings you back here.</em>` },
 
 /* ── 19 ─────────────────────────────────────────────────────────────────── */
-{ n:'19', rail:0, steps:3, arriveDark:true, html:`
+{ n:'21', rail:0, steps:3, arriveDark:true, html:`
   <p class="eyebrow" data-step="0">What just happened</p>
   <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">Same facts. Different verdicts.</h2>
   <div class="stack gap-m" style="margin-top:34px">
@@ -362,8 +454,34 @@ const SLIDES = [
   </div>`,
   notes:`Point at the cases where the room split. The disagreement is the evidence, not a problem.` },
 
+/* ── 22 · NEW — what the three instruments buy ────────────────────────────── */
+{ n:'22', rail:0, cls:'dense', steps:2, html:`
+  <p class="eyebrow" data-step="0">What the three instruments buy</p>
+  <h2 class="headline mw-lg" data-step="0" style="--i:1;margin-top:12px">Delegation, cascading, and the time you get back.</h2>
+  <div class="stack gap-m" style="margin-top:30px">
+    <div class="buys">
+      <div class="buys__r lift" data-step="1" style="--i:0">
+        <span class="buys__k">Delegation</span>
+        <span class="buys__d">You can only hand work to someone whose standard you trust. Trust and Standard together decide how much of your job you are able to stop doing yourself.</span>
+      </div>
+      <div class="buys__r lift" data-step="1" style="--i:1">
+        <span class="buys__k">Cascading</span>
+        <span class="buys__d">A message survives one level down only if the people carrying it will tell you when it is not landing. That is Signal, and it is the first of the three to go.</span>
+      </div>
+      <div class="buys__r lift" data-step="1" style="--i:2">
+        <span class="buys__k">Time</span>
+        <span class="buys__d">The minutes you spent asking are cheaper than the third occurrence, the audit that follows it, and the conversation you end up having anyway.</span>
+      </div>
+    </div>
+    <div class="stack gap-s push" data-step="2">
+      <div class="rule"></div>
+      <p class="display accent">The minutes are not the cost. They are what stops the same conversation happening three more times.</p>
+    </div>
+  </div>`,
+  notes:`This is where the minutes they just spent turn into an argument rather than a complaint. Ask: <em>which of your managers could you hand more to tomorrow, and what would have to be true first?</em>` },
+
 /* ── 20 ─────────────────────────────────────────────────────────────────── */
-{ n:'20', rail:0, steps:1, center:true, html:`
+{ n:'23', rail:0, steps:1, center:true, html:`
   <div class="stack gap-m mw-lg">
     <h2 class="headline" data-step="0">You will give feedback on this session.</h2>
     <p class="display" data-step="1">Same rules. Stop, ask, agree.</p>
@@ -371,7 +489,7 @@ const SLIDES = [
   notes:`Once, lightly, do not linger.` },
 
 /* ── 21 ─────────────────────────────────────────────────────────────────── */
-{ n:'21', rail:0, steps:3, center:true, html:`
+{ n:'24', rail:0, steps:3, center:true, html:`
   <div class="stack gap-l">
     <div class="stack gap-xs">
       <p class="said said--muted" data-step="1" style="--i:0">“Do you even know what you’re doing?”</p>
@@ -387,7 +505,7 @@ const SLIDES = [
   notes:`Let the room recognise them. This is where the session closes on itself.` },
 
 /* ── 22 ─────────────────────────────────────────────────────────────────── */
-{ n:'22', rail:0, steps:3, center:true, html:`
+{ n:'25', rail:0, steps:3, center:true, html:`
   <div class="stack gap-l">
     <div class="stack gap-s" data-until="2">
       <p class="eyebrow" data-step="0">Monday morning</p>

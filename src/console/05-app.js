@@ -100,17 +100,32 @@ function arcPath(cx, cy, r, a0, a1){
   return `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 0 ${a1 > a0 ? 1 : 0} ${x1.toFixed(2)} ${y1.toFixed(2)}`;
 }
 
-function buildGauges(){
-  $('r-gauges').innerHTML = GAUGES.map(g => {
-    const ticks = [-SCALE, -SCALE / 2, 0, SCALE / 2, SCALE].map(v => {
-      const a = (v / SCALE) * G.spread;
-      const major = v === 0;
-      const [x0, y0] = polar(G.cx, G.cy, G.r - (major ? 15 : 10), a);
-      const [x1, y1] = polar(G.cx, G.cy, G.r + 8, a);
-      return `<line class="g-tick${major ? ' g-tick--major' : ''}" x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}"/>`;
-    }).join('');
+function gaugeTicks(){
+  return [-SCALE, -SCALE / 2, 0, SCALE / 2, SCALE].map(v => {
+    const a = (v / SCALE) * G.spread;
+    const major = v === 0;
+    const [x0, y0] = polar(G.cx, G.cy, G.r - (major ? 15 : 10), a);
+    const [x1, y1] = polar(G.cx, G.cy, G.r + 8, a);
+    return `<line class="g-tick${major ? ' g-tick--major' : ''}" x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}"/>`;
+  }).join('');
+}
 
-    return `
+/* One dial, drawn at a fixed value. The rail's live gauges reuse the same
+   geometry and are then animated in place; the summary's larger dials are
+   drawn once, already settled. */
+function gaugeSvg(label, value, cls){
+  const a = (clamp(value, -SCALE, SCALE) / SCALE) * G.spread;
+  return `<svg class="${cls}" viewBox="0 0 ${G.w} ${G.h}" role="img" aria-label="${label} gauge">
+      <path class="g-track" d="${arcPath(G.cx, G.cy, G.r, -G.spread, G.spread)}"/>
+      ${gaugeTicks()}
+      <path class="g-active${value < 0 ? ' is-loss' : ''}" d="${arcPath(G.cx, G.cy, G.r, 0, a)}"/>
+      <line class="g-needle" x1="${G.cx}" y1="${G.cy - G.inner}" x2="${G.cx}" y2="${G.cy - G.outer}"
+            transform="rotate(${a.toFixed(2)} ${G.cx} ${G.cy})"/>
+    </svg>`;
+}
+
+function buildGauges(){
+  $('r-gauges').innerHTML = GAUGES.map(g => `
       <div class="gauge" data-g="${g.id}">
         <div class="gauge__head">
           <span class="gauge__name">${g.name}</span>
@@ -119,14 +134,13 @@ function buildGauges(){
         <svg class="gauge__svg" viewBox="0 0 ${G.w} ${G.h}" role="img"
              aria-label="${g.name} gauge">
           <path class="g-track" d="${arcPath(G.cx, G.cy, G.r, -G.spread, G.spread)}"/>
-          ${ticks}
+          ${gaugeTicks()}
           <path class="g-active" data-role="active" d=""/>
           <line class="g-needle" data-role="needle"
                 x1="${G.cx}" y1="${G.cy - G.inner}" x2="${G.cx}" y2="${G.cy - G.outer}"/>
         </svg>
         <div class="gauge__note">${g.note}</div>
-      </div>`;
-  }).join('');
+      </div>`).join('');
 }
 
 function paintGauge(id, value){
@@ -206,6 +220,9 @@ function show(view){
   ['title','case','conseq','summary'].forEach(v => {
     $('screen-' + v).classList.toggle('is-active', v === view);
   });
+  /* On the summary the instruments move to centre stage, so the rail steps
+     aside and the whole screen fits with nothing to scroll. */
+  document.querySelector('.main').classList.toggle('no-rail', view === 'summary');
   syncPresenter();
   syncNotes();
 }
@@ -292,60 +309,165 @@ function renderConseq(i){
   moveInstruments(true);
 }
 
+/* ── the four dimensions behind the reading ────────────────────────────────
+   Averages hide how a run was actually made, so the summary also reports how
+   often a question came before the verdict, how much of it happened in front
+   of an audience, whether one line was held, and which of the five points
+   gave way. */
+function diagnostics(){
+  const idxs = played();
+  const n = idxs.length;
+
+  /* Only cases that actually offered a question count in the denominator. */
+  let askTotal = 0, askTaken = 0;
+  CASES.forEach((c, i) => {
+    if (!idxs.includes(i)) return;
+    if (!c.options.some(o => o.asks)) return;
+    askTotal++;
+    if (state.choices[i].asks) askTaken++;
+  });
+
+  const audience = idxs.filter(i => state.choices[i].audience).length;
+
+  /* Spread of decision quality: the mean hides a swing, and a team lives the
+     swing rather than the mean. */
+  const q = idxs.map(i => {
+    const d = state.choices[i].d;
+    return d.trust + d.signal + d.standard;
+  });
+  const spread = q.length ? Math.max(...q) - Math.min(...q) : 0;
+
+  const breaks = {};
+  LOOP_POINTS.forEach(p => { breaks[p.id] = 0; });
+  idxs.forEach(i => (state.choices[i].breaks || []).forEach(b => { breaks[b]++; }));
+  const worst = LOOP_POINTS
+    .map(p => ({ ...p, count: breaks[p.id] }))
+    .sort((a, b) => b.count - a.count)[0];
+
+  return { n, askTotal, askTaken, audience, spread, breaks,
+           worst: worst && worst.count ? worst : null };
+}
+
+/* A reading of this particular run, assembled from the pattern rather than
+   picked from a list of fixed verdicts. */
+function readOut(dg, fast){
+  const n = dg.n;
+  if (!n) return 'No cases were played, so there is nothing to read yet.';
+  const t = totals();
+  const flat = v => Math.abs(v) <= n * 0.5;
+  const out = [];
+
+  if (t.trust > 0 && t.signal > 0 && t.standard > 0){
+    out.push('All three instruments finished positive. That is the most expensive way through these cases and the only one that compounds — the standard moved without the relationship paying for it.');
+  } else if (t.standard > 0 && t.trust <= 0 && t.signal <= 0){
+    out.push('Standard rose while Trust and Signal fell. The behaviour changed and the relationship paid for it, which holds for exactly as long as you are watching.');
+  } else if (t.trust > 0 && t.standard <= 0){
+    out.push('Trust held and Standard did not. Nobody had a bad hour, and nothing about tomorrow is different.');
+  } else if (flat(t.trust) && flat(t.signal) && flat(t.standard)){
+    out.push('All three instruments finished close to where they started. That usually means the decisions were absorbed rather than made.');
+  } else {
+    out.push('The three instruments finished pulling in different directions, which is what case-by-case judgement looks like from the outside.');
+  }
+
+  if (dg.askTotal){
+    if (dg.askTaken === 0){
+      out.push(`In the ${dg.askTotal} cases that offered you a question, you went straight to a verdict every time. Asking first is the one move that raises all three instruments at once.`);
+    } else if (dg.askTaken === dg.askTotal){
+      out.push('You asked before concluding every time a question was available. That is the whole method, and it is why the instruments moved together rather than against each other.');
+    } else {
+      out.push(`You asked before concluding in ${dg.askTaken} of the ${dg.askTotal} cases that offered a question.`);
+    }
+  }
+
+  if (dg.worst){
+    out.push(`${dg.worst.name} gave way most often — ${dg.worst.count} of your ${n} decisions broke it, at ${dg.worst.where.toLowerCase()}.`);
+  }
+  if (dg.audience){
+    out.push(`${dg.audience} decision${dg.audience === 1 ? '' : 's'} happened where other people could see or hear it. The witnesses learn faster than the person receiving it.`);
+  }
+
+  if (dg.spread >= 8){
+    out.push('The decisions also swung widely case to case, and a team lives the swing rather than the average.');
+  } else if (n >= 3){
+    out.push('You held a consistent line across the cases, which is what makes a standard predictable enough to work to.');
+  }
+
+  const diff = totalMinutes() - fast.min;
+  if (diff > 0) out.push(`It cost ${diff} minute${diff === 1 ? '' : 's'} more than the quickest route.`);
+
+  return out.join(' ');
+}
+
 function renderSummary(){
   const idxs = played();
   const n = idxs.length;
   const spent = totalMinutes();
   const fast = fastestPath();
   const t = totals();
+  const dg = diagnostics();
 
-  $('s-spent').textContent = spent;
-  $('s-fast').textContent  = fast.min;
-
-  const diff = spent - fast.min;
-  const scope = n === CASES.length ? 'these eight cases' : `the ${n} case${n === 1 ? '' : 's'} you played`;
-  $('s-lede').innerHTML = !n
-    ? 'No cases were played.'
-    : diff > 0
-      ? `<b>${diff} minute${diff === 1 ? '' : 's'}</b> separate the two columns. That is the entire price of the difference between them — and it is the only part of this that a calendar can see.`
-      : `You took the quickest route through ${scope}. The right-hand column is what that route leaves behind.`;
-
-  /* Each column states what its own route leaves on the instruments, so the
-     trade between minutes and everything else is legible in one glance. */
-  const row = g => ['trust','signal','standard'].map(k => {
-    const v = g[k];
-    return `<div class="vr">
-        <span class="vr__k">${k}</span>
-        <span class="vr__v ${v > 0 ? 'is-gain' : v < 0 ? 'is-loss' : 'is-flat'} num">${sign(v)}</span>
-      </div>`;
-  }).join('');
-  $('s-yours').innerHTML = n ? row(t) : '';
-  $('s-fastg').innerHTML = n ? row(fast.g) : '';
-
-  /* per-case strip — where the room's choices landed */
-  $('s-strip').innerHTML = CASES.map((c, i) => {
-    const o = state.choices[i];
-    if (!o) return `<div class="strip__c is-skipped">
-        <span class="strip__n num">${c.n}</span>
-        <span class="strip__l">${state.skipped[i] ? 'Skipped' : 'Not played'}</span>
-        <span class="strip__pips"></span><span class="strip__t num">—</span>
-      </div>`;
-    const pips = ['trust','signal','standard'].map(k => {
-      const v = o.d[k];
-      const h = 2 + Math.abs(v) / 3 * 22;
-      return `<span class="pip ${v > 0 ? 'is-gain' : v < 0 ? 'is-loss' : ''}" style="height:${h}px"></span>`;
-    }).join('');
-    return `<div class="strip__c">
-        <span class="strip__n num">${c.n}</span>
-        <span class="strip__l">${o.label}</span>
-        <span class="strip__pips">${pips}</span>
-        <span class="strip__t num">${o.min} min</span>
+  /* the three instruments lead */
+  $('s-kpis').innerHTML = GAUGES.map(g => {
+    const v = t[g.id];
+    const cls = v > 0 ? 'is-gain' : v < 0 ? 'is-loss' : 'is-flat';
+    return `<div class="kpi">
+        <div class="kpi__top">
+          <span class="kpi__k">${g.name}</span>
+          <span class="kpi__v ${cls} num">${sign(v)}</span>
+        </div>
+        ${gaugeSvg(g.id, v, 'kpi__svg')}
+        <p class="kpi__d">${g.desc}</p>
       </div>`;
   }).join('');
 
   const p = pickProfile(fast);
   $('s-profile').textContent = p.name;
-  $('s-profile-line').textContent = p.line;
+  $('s-readout').textContent = readOut(dg, fast);
+
+  const cell = (k, v, sub) =>
+    `<div class="diag__c"><span class="diag__k">${k}</span>
+       <span class="diag__v num">${v}${sub ? `<small>${sub}</small>` : ''}</span></div>`;
+  $('s-diag').innerHTML = n
+    ? cell('Asked first', dg.askTotal ? `${dg.askTaken}/${dg.askTotal}` : '—', dg.askTotal ? 'cases' : '')
+    + cell('In front of others', dg.audience, `of ${n}`)
+    + cell('Consistency', dg.spread >= 8 ? 'Swung' : 'Steady', `spread ${dg.spread}`)
+    + cell('Minutes', spent, `vs ${fast.min}`)
+    : '';
+
+  const maxB = Math.max(1, ...LOOP_POINTS.map(x => dg.breaks[x.id]));
+  $('s-breaks').innerHTML = n ? LOOP_POINTS.map(pt => {
+    const c = dg.breaks[pt.id];
+    return `<div class="brk${c ? '' : ' is-clean'}">
+        <span class="brk__k">${pt.name}</span>
+        <span class="brk__t"><span class="brk__f" style="width:${(c / maxB) * 100}%"></span></span>
+        <span class="brk__n num">${c || '·'}</span>
+      </div>`;
+  }).join('') : '';
+
+  $('s-spent').textContent = spent;
+  $('s-fast').textContent = fast.min;
+  const diff = spent - fast.min;
+  $('s-lede').innerHTML = !n ? ''
+    : diff > 0
+      ? `The quickest route finishes ${diff} minute${diff === 1 ? '' : 's'} sooner and leaves Trust ${sign(fast.g.trust)}, Signal ${sign(fast.g.signal)}, Standard ${sign(fast.g.standard)}.`
+      : `You took the quickest route. It leaves Trust ${sign(fast.g.trust)}, Signal ${sign(fast.g.signal)}, Standard ${sign(fast.g.standard)}.`;
+
+  $('s-strip').innerHTML = CASES.map((c, i) => {
+    const o = state.choices[i];
+    if (!o) return `<div class="strip__c is-skipped">
+        <span class="strip__n num">${c.n}</span>
+        <span class="strip__pips"></span><span class="strip__t num">—</span></div>`;
+    const pips = ['trust','signal','standard'].map(k => {
+      const v = o.d[k];
+      const h = 2 + Math.abs(v) / 3 * 15;
+      return `<span class="pip ${v > 0 ? 'is-gain' : v < 0 ? 'is-loss' : ''}" style="height:${h}px"></span>`;
+    }).join('');
+    return `<div class="strip__c">
+        <span class="strip__n num">${c.n}</span>
+        <span class="strip__pips">${pips}</span>
+        <span class="strip__t num">${o.min}m</span>
+      </div>`;
+  }).join('');
 
   $('s-notes').innerHTML =
     `<div class="notes__k">Facilitator · the fastest path</div>
@@ -357,7 +479,24 @@ function renderSummary(){
 
   show('summary');
   moveInstruments(false);
+  fitReadout();
 }
+
+/* Step the reading down until it fits its panel. Called after render and on
+   resize, so a long run never loses its last sentence off the bottom. */
+function fitReadout(){
+  const el = $('s-readout');
+  const box = el.closest('.panel');
+  if (!el || !box) return;
+  el.style.fontSize = '';
+  let size = parseFloat(getComputedStyle(el).fontSize);
+  let guard = 0;
+  while (box.scrollHeight > box.clientHeight + 1 && size > 12 && guard++ < 24){
+    size -= 0.5;
+    el.style.fontSize = size + 'px';
+  }
+}
+window.addEventListener('resize', () => { if (state.view === 'summary') fitReadout(); });
 
 /* ── profile ───────────────────────────────────────────────────────────── */
 function pickProfile(fast){

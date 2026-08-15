@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>The Broken Loop — Feedback Decision Console</title>
+<title>Feedback Management Dashboard</title>
 <style>
 /* ══════════════════════════════════════════════════════════════════════════
    POPPINS — Costa brand typeface, embedded as subset WOFF2 data URIs.
@@ -486,91 +486,109 @@ body{
 .loop__pt.is-break .loop__state{ color:var(--c-amber-mid); }
 .loop__pt.is-break .loop__name{ color:var(--text); }
 
-/* — 6.4 SUMMARY — */
-.summary-screen{ gap:1rem; overflow-y:auto; overflow-x:hidden; padding-right:.6rem; }
-.summary-screen::-webkit-scrollbar{ width:8px; }
-.summary-screen::-webkit-scrollbar-thumb{ background:var(--c-teal-mid); border-radius:4px; }
+/* the rail steps aside on the summary */
+.main.no-rail{ grid-template-columns:minmax(0,1fr); }
+.main.no-rail .rail{ display:none; }
 
-.sum-head{ font-size:2.5rem; }
+/* — 6.4 SUMMARY —
+   The three instruments are the outcome; time supports it. The rail steps
+   aside here so the KPIs get the full width and the whole screen fits with
+   nothing to scroll. */
+.summary-screen{ display:flex; flex-direction:column; gap:.7rem; min-height:0; }
 
-/* THE CLOSING ARGUMENT — the most prominent element on the screen */
-.verdict{
-  border:1px solid var(--accent);
-  background:linear-gradient(180deg, rgba(249,176,0,.12), rgba(249,176,0,.03));
-  border-radius:3px; padding:1.2rem 1.5rem 1.3rem;
+/* ── the three instruments, full size ── */
+.kpis{ display:grid; grid-template-columns:repeat(3, minmax(0,1fr)); gap:.7rem; flex:.82 1 0; min-height:0; }
+.kpi{
+  border:1px solid var(--line-strong); background:var(--panel-raised);
+  border-radius:3px; padding:.8rem 1.1rem .7rem;
+  display:flex; flex-direction:column; min-height:0;
 }
-.verdict__grid{ display:grid; grid-template-columns:1fr auto 1fr; gap:2rem; align-items:center; }
-.verdict__col{ display:flex; flex-direction:column; gap:.15rem; }
-.verdict__k{
-  font-size:1.125rem; font-weight:600; letter-spacing:.15em;
-  text-transform:uppercase; color:var(--c-amber-light);
+.kpi__top{ display:flex; align-items:baseline; justify-content:space-between; gap:.6rem; }
+.kpi__k{
+  font-size:1.25rem; font-weight:700; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--muted);
 }
-.verdict__col--alt .verdict__k{ color:var(--muted); }
-.verdict__n{
-  font-size:5.4rem; font-weight:300; line-height:.92; letter-spacing:-.035em; color:var(--text);
-}
-.verdict__col--alt .verdict__n{ color:var(--muted); }
-.verdict__u{
-  font-size:1.25rem; font-weight:600; letter-spacing:.13em;
-  text-transform:uppercase; color:var(--c-slate);
-}
-.verdict__div{ width:1px; align-self:stretch; background:var(--line-strong); }
+.kpi__v{ font-size:2.6rem; font-weight:600; line-height:1; }
+.kpi__v.is-gain{ color:var(--gain); }
+.kpi__v.is-loss{ color:var(--loss); }
+.kpi__v.is-flat{ color:var(--flat); }
+/* auto margins centre the dial in whatever height the card gets */
+.kpi__svg{ display:block; width:100%; height:auto; max-height:7.2rem; margin:auto 0 .5rem; flex:0 1 auto; }
+.kpi__d{ font-size:1.125rem; font-weight:300; line-height:1.35; color:var(--muted); }
 
-/* what each of the two routes leaves on the instruments */
-.verdict__row{
-  display:flex; gap:1.8rem; flex-wrap:wrap;
-  margin-top:.8rem; padding-top:.7rem; border-top:1px solid rgba(249,176,0,.22);
-}
-.verdict__col--alt .verdict__row{ border-top-color:var(--line); }
-.vr{ display:flex; flex-direction:column; gap:.15rem; }
-.vr__k{
-  font-size:1.125rem; font-weight:600; letter-spacing:.13em;
-  text-transform:uppercase; color:var(--c-slate);
-}
-.vr__v{ font-size:1.9rem; font-weight:600; line-height:1; }
-.vr__v.is-gain{ color:var(--gain); }
-.vr__v.is-loss{ color:var(--loss); }
-.vr__v.is-flat{ color:var(--flat); }
-
-.verdict__lede{
-  margin-top:1rem; padding-top:.9rem; border-top:1px solid rgba(249,176,0,.30);
-  font-size:1.5rem; font-weight:300; line-height:1.4; color:var(--text); max-width:76rem;
-}
-.verdict__lede b{ font-weight:600; color:var(--accent); }
-
-/* profile reads as a band, not a column */
-.profile__head{ display:flex; align-items:center; gap:2.4rem; flex-wrap:wrap; }
-.profile__head .panel__k{ margin-bottom:.25rem; }
-
-/* summary sub-panels */
-.sum-cols{ display:grid; grid-template-columns:1.15fr 1fr; gap:1.1rem; align-items:start; }
+/* ── the reading and the diagnostics ── */
+/* Three columns rather than two: stacking the diagnostics above the break
+   points made that one column twice as tall as the row could ever be. */
+.sum-mid{ display:grid; grid-template-columns:1.75fr 1fr 1.05fr; gap:.7rem; flex:1 1 0; min-height:0; }
 .panel{
   border:1px solid var(--line); background:var(--panel);
-  border-radius:3px; padding:.9rem 1.2rem 1rem;
+  border-radius:3px; padding:.75rem 1.1rem .85rem;
+  display:flex; flex-direction:column; min-height:0;
 }
 .panel__k{
   font-size:1.125rem; font-weight:600; letter-spacing:.15em;
-  text-transform:uppercase; color:var(--muted); margin-bottom:.6rem;
+  text-transform:uppercase; color:var(--muted); margin-bottom:.45rem;
 }
-.profile__name{ font-size:2.6rem; font-weight:700; line-height:1.05; letter-spacing:-.015em; }
-.profile__line{ font-size:1.5rem; font-weight:300; line-height:1.5; color:var(--muted); flex:1 1 24rem; }
+.profile__name{ font-size:2rem; font-weight:700; line-height:1.05; letter-spacing:-.015em; }
+.readout{
+  font-size:1.25rem; font-weight:300; line-height:1.45; color:var(--text);
+  margin-top:.45rem;
+}
 
-/* per-case strip — full width, so the labels read at a glance */
-.strip{ display:grid; grid-template-columns:repeat(8, minmax(0,1fr)); gap:.6rem; }
+/* The reading is generated, so its length varies with the run. The panel
+   clips and the engine steps the size down until it fits — no scrollbar, and
+   no run that silently loses its last sentence. */
+.panel--read{ overflow:hidden; }
+
+/* four dimensions behind the reading */
+.diag{ display:grid; grid-template-columns:1fr 1fr; gap:.5rem .9rem; align-content:start; }
+.diag__c{ display:flex; flex-direction:column; gap:.05rem; }
+.diag__k{
+  font-size:1.125rem; font-weight:600; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--c-slate);
+}
+.diag__v{ font-size:1.5rem; font-weight:600; line-height:1.1; color:var(--text); }
+.diag__v small{ font-size:.62em; font-weight:400; color:var(--muted); margin-left:.2em; }
+
+/* which of the five gave way, and how often */
+.breaks{ display:flex; flex-direction:column; gap:.3rem; min-height:0; justify-content:center; flex:1 1 auto; }
+.brk{ display:flex; align-items:center; gap:.6rem; }
+/* one line each: a wrapped label doubles the row height and pushes the
+   last of the five out of the panel */
+.brk__k{ flex:0 0 9.6rem; font-size:1.125rem; font-weight:400; color:var(--muted); white-space:nowrap; }
+.brk__t{ flex:1 1 auto; height:.55rem; background:rgba(0,0,0,.28); border-radius:1px; overflow:hidden; }
+.brk__f{ height:100%; width:0; background:var(--loss); transition:width .5s var(--ease-settle); }
+.brk__n{ flex:0 0 1.6rem; text-align:right; font-size:1.125rem; font-weight:600; color:var(--text); }
+.brk.is-clean .brk__n{ color:var(--c-teal-mid); }
+
+/* ── time, supporting ── */
+.sum-foot{ display:grid; grid-template-columns:1.15fr 1fr; gap:.7rem; flex:0 0 auto; }
+.panel--time{ border-color:rgba(249,176,0,.45); background:linear-gradient(180deg, rgba(249,176,0,.10), rgba(249,176,0,.03)); }
+.panel--time .panel__k{ color:var(--c-amber-light); }
+.timerow{ display:flex; align-items:baseline; gap:1.3rem; }
+.timerow__c{ display:flex; align-items:baseline; gap:.4rem; flex:0 0 auto; }
+.timerow__n{ font-size:2.3rem; font-weight:300; line-height:1; letter-spacing:-.02em; }
+.timerow__c--alt .timerow__n{ color:var(--muted); }
+.timerow__l{
+  font-size:1.125rem; font-weight:600; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--c-slate);
+}
+.timerow__d{ flex:1 1 auto; font-size:1.125rem; font-weight:300; line-height:1.35; color:var(--muted); }
+
+/* per-case strip */
+.strip{ display:grid; grid-template-columns:repeat(8, minmax(0,1fr)); gap:.35rem; }
 .strip__c{
   border:1px solid var(--line); border-radius:3px;
-  background:rgba(0,0,0,.18); padding:.6rem .7rem .7rem;
-  display:flex; flex-direction:column; gap:.35rem; min-width:0;
+  background:rgba(0,0,0,.18); padding:.35rem .4rem .4rem;
+  display:flex; flex-direction:column; gap:.2rem; min-width:0;
 }
-.strip__n{ font-size:1.125rem; font-weight:700; color:var(--accent); letter-spacing:.08em; }
-.strip__l{ font-size:1.125rem; font-weight:400; line-height:1.28; color:var(--text); flex:1 1 auto; }
-.strip__c.is-skipped .strip__l,
-.strip__c.is-skipped .strip__n{ color:var(--c-teal-mid); }
-.strip__pips{ display:flex; gap:.22rem; align-items:flex-end; height:1.5rem; }
-.pip{ flex:1 1 0; background:var(--flat); min-height:2px; border-radius:1px; opacity:.9; }
+.strip__n{ font-size:1.125rem; font-weight:700; color:var(--accent); letter-spacing:.06em; }
+.strip__pips{ display:flex; gap:.16rem; align-items:flex-end; height:1.1rem; }
+.pip{ flex:1 1 0; background:var(--flat); min-height:2px; border-radius:1px; }
 .pip.is-gain{ background:var(--gain); }
 .pip.is-loss{ background:var(--loss); }
 .strip__t{ font-size:1.125rem; font-weight:600; color:var(--c-slate); }
+.strip__c.is-skipped .strip__n{ color:var(--c-teal-mid); }
 
 /* ══════════════════════════════════════════════════════════════════════════
    7. FACILITATOR LAYER — hidden by default
@@ -601,8 +619,8 @@ body{
   .main{ grid-template-columns:minmax(0,1fr) 22rem; }
   .stage{ padding:1.6rem 1.9rem 1.5rem; }
   .title-screen .headline{ font-size:5.6rem; }
-  .verdict__n{ font-size:5rem; }
-  .sum-head{ font-size:2.6rem; }
+  .kpi__v{ font-size:2.2rem; }
+  .profile__name{ font-size:1.75rem; }
 }
 @media (max-width:1180px){
   .main{ grid-template-columns:minmax(0,1fr); grid-template-rows:minmax(0,1fr) auto; }
@@ -643,8 +661,14 @@ body{
   .setup{ font-size:1.5rem; }
   .question{ font-size:2rem; }
   .conseq-text{ font-size:1.4rem; }
-  .verdict__n{ font-size:4.6rem; }
-  .sum-head{ font-size:2.1rem; }
+  /* On a short screen the dials give up height so the diagnostics keep all
+     five break points inside their panel. */
+  .kpis{ flex:.72 1 0; }
+  .kpi__v{ font-size:2rem; }
+  .kpi__svg{ max-height:6.4rem; }
+  .profile__name{ font-size:1.6rem; }
+  .readout{ font-size:1.125rem; }
+  .timerow__n{ font-size:1.9rem; }
 
   /* Compress the rail so the whole instrument panel still fits on a laptop.
      The gauge captions go first — the trainer says those out loud anyway. */
@@ -655,7 +679,7 @@ body{
   .integrity__bar{ margin-top:.45rem; }
   .gauges{ gap:.5rem; }
   .gauge{ padding:.5rem .8rem .35rem; }
-  .gauge__note{ display:none; }
+  .gauge__svg{ max-height:3.9rem; }
   .timecost{ padding:.6rem .9rem .65rem; }
   .timecost__v{ font-size:2.2rem; }
 }
@@ -698,9 +722,7 @@ body{
     <div class="lockup">
       <img class="lockup__mark" src="data:image/png;base64,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" alt="Costa Crociere">
       <div class="lockup__text">
-        <div class="lead">Costa Crociere</div>
-        <div>Leadership Training</div>
-        <div>The Broken Loop<span class="dot dot--small"></span></div>
+        <div class="lead">Feedback Management Dashboard<span class="dot dot--small"></span></div>
       </div>
     </div>
 
@@ -763,46 +785,50 @@ body{
         <div class="notes" id="q-notes"></div>
       </section>
 
-      <!-- ══ 4. SUMMARY ════════════════════════════════════════════════ -->
+      <!-- ══ 4. SUMMARY ════════════════════════════════════════════════
+           The three instruments lead. Time is present and still carries the
+           fastest-path comparison, but it no longer sets the headline. -->
       <section class="screen summary-screen" id="screen-summary" aria-label="Summary">
-        <h2 class="title-stack sum-head">
-          <span class="t1">What it cost</span>
-          <span class="t2">in minutes<span class="dot"></span></span>
-        </h2>
 
-        <!-- the closing argument of the whole session: each column carries
-             its own cost, so the trade is readable in one glance -->
-        <div class="verdict">
-          <div class="verdict__grid">
-            <div class="verdict__col">
-              <span class="verdict__k">You spent</span>
-              <span class="verdict__n num" id="s-spent">0</span>
-              <span class="verdict__u">minutes</span>
-              <div class="verdict__row" id="s-yours"></div>
-            </div>
-            <div class="verdict__div"></div>
-            <div class="verdict__col verdict__col--alt">
-              <span class="verdict__k">The fastest path</span>
-              <span class="verdict__n num" id="s-fast">0</span>
-              <span class="verdict__u">minutes</span>
-              <div class="verdict__row" id="s-fastg"></div>
+        <div class="kpis" id="s-kpis"></div>
+
+        <div class="sum-mid">
+          <div class="panel panel--read">
+            <div class="panel__k">How the feedback was processed</div>
+            <div class="profile__name" id="s-profile"></div>
+            <p class="readout" id="s-readout"></p>
+          </div>
+
+          <div class="panel">
+            <div class="panel__k">Diagnostics</div>
+            <div class="diag" id="s-diag"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__k">Where the loop gave way</div>
+            <div class="breaks" id="s-breaks"></div>
+          </div>
+        </div>
+
+        <div class="sum-foot">
+          <div class="panel panel--time">
+            <div class="panel__k">Time</div>
+            <div class="timerow">
+              <div class="timerow__c">
+                <span class="timerow__n num" id="s-spent">0</span>
+                <span class="timerow__l">minutes spent</span>
+              </div>
+              <div class="timerow__c timerow__c--alt">
+                <span class="timerow__n num" id="s-fast">0</span>
+                <span class="timerow__l">fastest path</span>
+              </div>
+              <p class="timerow__d" id="s-lede"></p>
             </div>
           </div>
-          <p class="verdict__lede" id="s-lede"></p>
-        </div>
 
-        <div class="panel">
-          <div class="panel__k">Where the room landed</div>
-          <div class="strip" id="s-strip"></div>
-        </div>
-
-        <div class="panel">
-          <div class="profile__head">
-            <div>
-              <div class="panel__k">Profile</div>
-              <div class="profile__name" id="s-profile"></div>
-            </div>
-            <p class="profile__line" id="s-profile-line"></p>
+          <div class="panel">
+            <div class="panel__k">Where the room landed</div>
+            <div class="strip" id="s-strip"></div>
           </div>
         </div>
 
@@ -859,11 +885,15 @@ const LOOP_POINTS = [
 
 const ALL = LOOP_POINTS.map(p => p.id);
 
-/* Captions are kept to a single line at every supported width. */
+/* note — the one-line caption under each gauge, kept to a single line at
+   every supported width.  desc — the fuller definition on the summary. */
 const GAUGES = [
-  { id:'trust',    name:'Trust',    note:'the person in front of you' },
-  { id:'signal',   name:'Signal',   note:'will they tell you next time' },
-  { id:'standard', name:'Standard', note:'does the behaviour change' }
+  { id:'trust',    name:'Trust',    note:'the person in front of you',
+    desc:'What the conversation cost the person in front of you.' },
+  { id:'signal',   name:'Signal',   note:'will they tell you next time',
+    desc:'Whether they will bring you the next problem, or handle it quietly.' },
+  { id:'standard', name:'Standard', note:'does the behaviour change',
+    desc:'Whether the behaviour actually changes after the conversation.' }
 ];
 
 const CASES = [
@@ -874,7 +904,7 @@ const CASES = [
     setup:'Third spot check this month. Same section, same gaps: waste not segregated, sanitizer log not filled in. The section is run by a Sous Chef who reports to the Executive Chef, your peer under the same Director. Two crew are working two metres away.',
     question:'What do you do first',
     options:[
-      { id:'A', label:'Correct on the spot',
+      { id:'A', label:'Correct on the spot', audience:true,
         text:'Correct the Sous Chef on the spot, in the section, so the crew see the standard is not negotiable.',
         d:{trust:-2, signal:-2, standard:1}, min:1,
         breaks:['respect','speakup'],
@@ -889,7 +919,7 @@ const CASES = [
         d:{trust:1, signal:0, standard:2}, min:3,
         breaks:['listen'],
         conseq:'Right place, right facts, right tone. But you delivered a verdict without asking why this same gap keeps appearing in this same section, and you left without agreeing what changes. This is the version most managers believe is good practice, and it is the one that quietly repeats.' },
-      { id:'D', label:'Aside, ask, agree, brief',
+      { id:'D', label:'Aside, ask, agree, brief', asks:true,
         text:'Take him aside, name the specific gap, ask what makes this section harder to keep compliant than the others, agree one change and a check date. Brief the Executive Chef afterwards so he is not surprised.',
         d:{trust:2, signal:2, standard:3}, min:6,
         holds:ALL,
@@ -909,7 +939,7 @@ const CASES = [
         d:{trust:-3, signal:-1, standard:0}, min:5,
         breaks:['listen','respect'],
         conseq:'You have built an accusation out of a correlation and delivered it to the person with the most to lose. Whatever the truth is, you will not hear it now. If he is innocent you have damaged your best performer. If he is not, you have warned him.' },
-      { id:'B', label:'Brief all four together',
+      { id:'B', label:'Brief all four together', audience:true,
         text:'Brief all four together on pour standards and stock discipline, without mentioning the variance.',
         d:{trust:-1, signal:-1, standard:0}, min:5,
         breaks:['respect','speakup'],
@@ -918,7 +948,7 @@ const CASES = [
         text:'Escalate to the F&B Director and let the process handle it. Say nothing to the team.',
         d:{trust:0, signal:-1, standard:1}, min:2,
         conseq:'Defensible, and in a genuine misconduct case this is correct. But you have skipped the step that would tell you whether this is misconduct at all. If it turns out to be a broken stock-count procedure, you have escalated your own team over a spreadsheet error.' },
-      { id:'D', label:'Check the process first',
+      { id:'D', label:'Check the process first', asks:true,
         text:'Check the process before the people. Pull the count method, the transfer records, the shift pattern. If the variance survives that, open with facts and a question rather than a conclusion.',
         d:{trust:2, signal:3, standard:3}, min:30,
         holds:['listen','speakup'],
@@ -934,7 +964,7 @@ const CASES = [
     setup:'An excursion departed forty minutes late. Coaches were booked to the published time; the operations team worked from an updated time that was never circulated back. Guests waited on the pier. The team is back on board and visibly rattled. Complaints are already logged. It is 18:00 and the team goes off shift at 19:00.',
     question:'What do you do',
     options:[
-      { id:'A', label:'Debrief now, establish who',
+      { id:'A', label:'Debrief now, establish who', audience:true,
         text:'Debrief the whole team now while it is fresh, and establish who changed the time.',
         d:{trust:-2, signal:-2, standard:1}, min:20,
         breaks:['listen','together'],
@@ -948,7 +978,7 @@ const CASES = [
         text:'Stop the operational bleeding first. Confirm tomorrow’s timings in writing with everyone tonight, and hold the conversation about what happened tomorrow morning.',
         d:{trust:2, signal:2, standard:2}, min:10,
         conseq:'You have separated the fix from the lesson, which is the right order while guests are still affected and the team is still hot. The risk is that tomorrow morning never arrives. This is exactly how a fix becomes a substitute for learning.' },
-      { id:'D', label:'Two conversations tonight',
+      { id:'D', label:'Two conversations tonight', asks:true,
         text:'Speak tonight, individually, to the two people closest to the handover. Ask each what they were working from. Bring the team together tomorrow with the sequence already established.',
         d:{trust:2, signal:3, standard:3}, min:25,
         conseq:'You get the facts before the story sets, and nobody has to defend themselves in front of the group. The team meeting then becomes a conversation about the process, which is where it belongs.' }
@@ -971,11 +1001,11 @@ const CASES = [
         text:'Say nothing yet. Six weeks is short and the previous six months were strong.',
         d:{trust:0, signal:0, standard:-2}, min:0,
         conseq:'Patience without inquiry is not patience, it is delay. If the cause is structural it compounds while you wait. If the cause is personal, your silence reads as indifference.' },
-      { id:'C', label:'Ask what changed',
+      { id:'C', label:'Ask what changed', asks:true,
         text:'Ask what has changed in the last six weeks, before looking at the numbers together.',
         d:{trust:3, signal:3, standard:2}, min:20,
         conseq:'Six weeks of decline after six months of delivery is almost never a competence signal. Something changed: a supplier, a staffing level, an itinerary, a person. The question finds it. The target does not.' },
-      { id:'D', label:'What the numbers do not show',
+      { id:'D', label:'What the numbers do not show', asks:true,
         text:'Bring the numbers and ask him to walk you through what they are not showing.',
         d:{trust:2, signal:3, standard:3}, min:20,
         conseq:'You have made the data a shared object rather than a verdict, and explicitly invited the information the report cannot carry. He is still accountable, because he is still explaining his own numbers.' }
@@ -1027,7 +1057,7 @@ const CASES = [
         text:'Handle it yourself with the guest, close the loop with the HGM, say nothing to her.',
         d:{trust:1, signal:-1, standard:-2}, min:20,
         conseq:'You protected her from a bad hour and denied her the information she needed. She will find out anyway, from someone else, and that version will be worse than the one you would have given her.' },
-      { id:'C', label:'Ask what happened first',
+      { id:'C', label:'Ask what happened first', asks:true,
         text:'Ask her what happened before you say anything about the complaint. Then decide.',
         d:{trust:3, signal:3, standard:2}, min:15,
         conseq:'A competent person with no history and a bad outcome is a question, not a verdict. You may find a guest who was already impossible, a system that failed her, or a genuine lapse. All three need a different response and you cannot tell which you have until you ask.' },
@@ -1057,7 +1087,7 @@ const CASES = [
         text:'Say nothing. The event happened, the guests were served, and the cost of the argument exceeds the cost of the failure.',
         d:{trust:0, signal:-2, standard:-3}, min:0,
         conseq:'Guaranteed to repeat, at a larger event, with less time. The absence of an owner is exactly why nobody else will raise it if you do not.' },
-      { id:'D', label:'Build the timeline together',
+      { id:'D', label:'Build the timeline together', asks:true,
         text:'Bring the three together and reconstruct the sequence with times, before anyone gives an account. Then agree who holds the handover next time.',
         d:{trust:2, signal:3, standard:3}, min:45,
         conseq:'A timeline is not an accusation, so people can contribute to it without defending themselves. Once the sequence is visible the gap is obvious, and ownership becomes an answer rather than a contest.' }
@@ -1072,7 +1102,7 @@ const CASES = [
     setup:'Another Director’s team has twice acted inside an area where your responsibilities overlap. The split has never been written down. It has cost you rework both times. You have no authority over him and you will work alongside him for the next four months.',
     question:'How do you raise it',
     options:[
-      { id:'A', label:'At the Directors’ meeting',
+      { id:'A', label:'At the Directors’ meeting', audience:true,
         text:'Raise it at the next Directors’ meeting, so it is on the record with everyone present.',
         d:{trust:-3, signal:-2, standard:1}, min:5,
         breaks:['respect','together'],
@@ -1205,17 +1235,32 @@ function arcPath(cx, cy, r, a0, a1){
   return `M ${x0.toFixed(2)} ${y0.toFixed(2)} A ${r} ${r} 0 0 ${a1 > a0 ? 1 : 0} ${x1.toFixed(2)} ${y1.toFixed(2)}`;
 }
 
-function buildGauges(){
-  $('r-gauges').innerHTML = GAUGES.map(g => {
-    const ticks = [-SCALE, -SCALE / 2, 0, SCALE / 2, SCALE].map(v => {
-      const a = (v / SCALE) * G.spread;
-      const major = v === 0;
-      const [x0, y0] = polar(G.cx, G.cy, G.r - (major ? 15 : 10), a);
-      const [x1, y1] = polar(G.cx, G.cy, G.r + 8, a);
-      return `<line class="g-tick${major ? ' g-tick--major' : ''}" x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}"/>`;
-    }).join('');
+function gaugeTicks(){
+  return [-SCALE, -SCALE / 2, 0, SCALE / 2, SCALE].map(v => {
+    const a = (v / SCALE) * G.spread;
+    const major = v === 0;
+    const [x0, y0] = polar(G.cx, G.cy, G.r - (major ? 15 : 10), a);
+    const [x1, y1] = polar(G.cx, G.cy, G.r + 8, a);
+    return `<line class="g-tick${major ? ' g-tick--major' : ''}" x1="${x0.toFixed(1)}" y1="${y0.toFixed(1)}" x2="${x1.toFixed(1)}" y2="${y1.toFixed(1)}"/>`;
+  }).join('');
+}
 
-    return `
+/* One dial, drawn at a fixed value. The rail's live gauges reuse the same
+   geometry and are then animated in place; the summary's larger dials are
+   drawn once, already settled. */
+function gaugeSvg(label, value, cls){
+  const a = (clamp(value, -SCALE, SCALE) / SCALE) * G.spread;
+  return `<svg class="${cls}" viewBox="0 0 ${G.w} ${G.h}" role="img" aria-label="${label} gauge">
+      <path class="g-track" d="${arcPath(G.cx, G.cy, G.r, -G.spread, G.spread)}"/>
+      ${gaugeTicks()}
+      <path class="g-active${value < 0 ? ' is-loss' : ''}" d="${arcPath(G.cx, G.cy, G.r, 0, a)}"/>
+      <line class="g-needle" x1="${G.cx}" y1="${G.cy - G.inner}" x2="${G.cx}" y2="${G.cy - G.outer}"
+            transform="rotate(${a.toFixed(2)} ${G.cx} ${G.cy})"/>
+    </svg>`;
+}
+
+function buildGauges(){
+  $('r-gauges').innerHTML = GAUGES.map(g => `
       <div class="gauge" data-g="${g.id}">
         <div class="gauge__head">
           <span class="gauge__name">${g.name}</span>
@@ -1224,14 +1269,13 @@ function buildGauges(){
         <svg class="gauge__svg" viewBox="0 0 ${G.w} ${G.h}" role="img"
              aria-label="${g.name} gauge">
           <path class="g-track" d="${arcPath(G.cx, G.cy, G.r, -G.spread, G.spread)}"/>
-          ${ticks}
+          ${gaugeTicks()}
           <path class="g-active" data-role="active" d=""/>
           <line class="g-needle" data-role="needle"
                 x1="${G.cx}" y1="${G.cy - G.inner}" x2="${G.cx}" y2="${G.cy - G.outer}"/>
         </svg>
         <div class="gauge__note">${g.note}</div>
-      </div>`;
-  }).join('');
+      </div>`).join('');
 }
 
 function paintGauge(id, value){
@@ -1311,6 +1355,9 @@ function show(view){
   ['title','case','conseq','summary'].forEach(v => {
     $('screen-' + v).classList.toggle('is-active', v === view);
   });
+  /* On the summary the instruments move to centre stage, so the rail steps
+     aside and the whole screen fits with nothing to scroll. */
+  document.querySelector('.main').classList.toggle('no-rail', view === 'summary');
   syncPresenter();
   syncNotes();
 }
@@ -1397,60 +1444,165 @@ function renderConseq(i){
   moveInstruments(true);
 }
 
+/* ── the four dimensions behind the reading ────────────────────────────────
+   Averages hide how a run was actually made, so the summary also reports how
+   often a question came before the verdict, how much of it happened in front
+   of an audience, whether one line was held, and which of the five points
+   gave way. */
+function diagnostics(){
+  const idxs = played();
+  const n = idxs.length;
+
+  /* Only cases that actually offered a question count in the denominator. */
+  let askTotal = 0, askTaken = 0;
+  CASES.forEach((c, i) => {
+    if (!idxs.includes(i)) return;
+    if (!c.options.some(o => o.asks)) return;
+    askTotal++;
+    if (state.choices[i].asks) askTaken++;
+  });
+
+  const audience = idxs.filter(i => state.choices[i].audience).length;
+
+  /* Spread of decision quality: the mean hides a swing, and a team lives the
+     swing rather than the mean. */
+  const q = idxs.map(i => {
+    const d = state.choices[i].d;
+    return d.trust + d.signal + d.standard;
+  });
+  const spread = q.length ? Math.max(...q) - Math.min(...q) : 0;
+
+  const breaks = {};
+  LOOP_POINTS.forEach(p => { breaks[p.id] = 0; });
+  idxs.forEach(i => (state.choices[i].breaks || []).forEach(b => { breaks[b]++; }));
+  const worst = LOOP_POINTS
+    .map(p => ({ ...p, count: breaks[p.id] }))
+    .sort((a, b) => b.count - a.count)[0];
+
+  return { n, askTotal, askTaken, audience, spread, breaks,
+           worst: worst && worst.count ? worst : null };
+}
+
+/* A reading of this particular run, assembled from the pattern rather than
+   picked from a list of fixed verdicts. */
+function readOut(dg, fast){
+  const n = dg.n;
+  if (!n) return 'No cases were played, so there is nothing to read yet.';
+  const t = totals();
+  const flat = v => Math.abs(v) <= n * 0.5;
+  const out = [];
+
+  if (t.trust > 0 && t.signal > 0 && t.standard > 0){
+    out.push('All three instruments finished positive. That is the most expensive way through these cases and the only one that compounds — the standard moved without the relationship paying for it.');
+  } else if (t.standard > 0 && t.trust <= 0 && t.signal <= 0){
+    out.push('Standard rose while Trust and Signal fell. The behaviour changed and the relationship paid for it, which holds for exactly as long as you are watching.');
+  } else if (t.trust > 0 && t.standard <= 0){
+    out.push('Trust held and Standard did not. Nobody had a bad hour, and nothing about tomorrow is different.');
+  } else if (flat(t.trust) && flat(t.signal) && flat(t.standard)){
+    out.push('All three instruments finished close to where they started. That usually means the decisions were absorbed rather than made.');
+  } else {
+    out.push('The three instruments finished pulling in different directions, which is what case-by-case judgement looks like from the outside.');
+  }
+
+  if (dg.askTotal){
+    if (dg.askTaken === 0){
+      out.push(`In the ${dg.askTotal} cases that offered you a question, you went straight to a verdict every time. Asking first is the one move that raises all three instruments at once.`);
+    } else if (dg.askTaken === dg.askTotal){
+      out.push('You asked before concluding every time a question was available. That is the whole method, and it is why the instruments moved together rather than against each other.');
+    } else {
+      out.push(`You asked before concluding in ${dg.askTaken} of the ${dg.askTotal} cases that offered a question.`);
+    }
+  }
+
+  if (dg.worst){
+    out.push(`${dg.worst.name} gave way most often — ${dg.worst.count} of your ${n} decisions broke it, at ${dg.worst.where.toLowerCase()}.`);
+  }
+  if (dg.audience){
+    out.push(`${dg.audience} decision${dg.audience === 1 ? '' : 's'} happened where other people could see or hear it. The witnesses learn faster than the person receiving it.`);
+  }
+
+  if (dg.spread >= 8){
+    out.push('The decisions also swung widely case to case, and a team lives the swing rather than the average.');
+  } else if (n >= 3){
+    out.push('You held a consistent line across the cases, which is what makes a standard predictable enough to work to.');
+  }
+
+  const diff = totalMinutes() - fast.min;
+  if (diff > 0) out.push(`It cost ${diff} minute${diff === 1 ? '' : 's'} more than the quickest route.`);
+
+  return out.join(' ');
+}
+
 function renderSummary(){
   const idxs = played();
   const n = idxs.length;
   const spent = totalMinutes();
   const fast = fastestPath();
   const t = totals();
+  const dg = diagnostics();
 
-  $('s-spent').textContent = spent;
-  $('s-fast').textContent  = fast.min;
-
-  const diff = spent - fast.min;
-  const scope = n === CASES.length ? 'these eight cases' : `the ${n} case${n === 1 ? '' : 's'} you played`;
-  $('s-lede').innerHTML = !n
-    ? 'No cases were played.'
-    : diff > 0
-      ? `<b>${diff} minute${diff === 1 ? '' : 's'}</b> separate the two columns. That is the entire price of the difference between them — and it is the only part of this that a calendar can see.`
-      : `You took the quickest route through ${scope}. The right-hand column is what that route leaves behind.`;
-
-  /* Each column states what its own route leaves on the instruments, so the
-     trade between minutes and everything else is legible in one glance. */
-  const row = g => ['trust','signal','standard'].map(k => {
-    const v = g[k];
-    return `<div class="vr">
-        <span class="vr__k">${k}</span>
-        <span class="vr__v ${v > 0 ? 'is-gain' : v < 0 ? 'is-loss' : 'is-flat'} num">${sign(v)}</span>
-      </div>`;
-  }).join('');
-  $('s-yours').innerHTML = n ? row(t) : '';
-  $('s-fastg').innerHTML = n ? row(fast.g) : '';
-
-  /* per-case strip — where the room's choices landed */
-  $('s-strip').innerHTML = CASES.map((c, i) => {
-    const o = state.choices[i];
-    if (!o) return `<div class="strip__c is-skipped">
-        <span class="strip__n num">${c.n}</span>
-        <span class="strip__l">${state.skipped[i] ? 'Skipped' : 'Not played'}</span>
-        <span class="strip__pips"></span><span class="strip__t num">—</span>
-      </div>`;
-    const pips = ['trust','signal','standard'].map(k => {
-      const v = o.d[k];
-      const h = 2 + Math.abs(v) / 3 * 22;
-      return `<span class="pip ${v > 0 ? 'is-gain' : v < 0 ? 'is-loss' : ''}" style="height:${h}px"></span>`;
-    }).join('');
-    return `<div class="strip__c">
-        <span class="strip__n num">${c.n}</span>
-        <span class="strip__l">${o.label}</span>
-        <span class="strip__pips">${pips}</span>
-        <span class="strip__t num">${o.min} min</span>
+  /* the three instruments lead */
+  $('s-kpis').innerHTML = GAUGES.map(g => {
+    const v = t[g.id];
+    const cls = v > 0 ? 'is-gain' : v < 0 ? 'is-loss' : 'is-flat';
+    return `<div class="kpi">
+        <div class="kpi__top">
+          <span class="kpi__k">${g.name}</span>
+          <span class="kpi__v ${cls} num">${sign(v)}</span>
+        </div>
+        ${gaugeSvg(g.id, v, 'kpi__svg')}
+        <p class="kpi__d">${g.desc}</p>
       </div>`;
   }).join('');
 
   const p = pickProfile(fast);
   $('s-profile').textContent = p.name;
-  $('s-profile-line').textContent = p.line;
+  $('s-readout').textContent = readOut(dg, fast);
+
+  const cell = (k, v, sub) =>
+    `<div class="diag__c"><span class="diag__k">${k}</span>
+       <span class="diag__v num">${v}${sub ? `<small>${sub}</small>` : ''}</span></div>`;
+  $('s-diag').innerHTML = n
+    ? cell('Asked first', dg.askTotal ? `${dg.askTaken}/${dg.askTotal}` : '—', dg.askTotal ? 'cases' : '')
+    + cell('In front of others', dg.audience, `of ${n}`)
+    + cell('Consistency', dg.spread >= 8 ? 'Swung' : 'Steady', `spread ${dg.spread}`)
+    + cell('Minutes', spent, `vs ${fast.min}`)
+    : '';
+
+  const maxB = Math.max(1, ...LOOP_POINTS.map(x => dg.breaks[x.id]));
+  $('s-breaks').innerHTML = n ? LOOP_POINTS.map(pt => {
+    const c = dg.breaks[pt.id];
+    return `<div class="brk${c ? '' : ' is-clean'}">
+        <span class="brk__k">${pt.name}</span>
+        <span class="brk__t"><span class="brk__f" style="width:${(c / maxB) * 100}%"></span></span>
+        <span class="brk__n num">${c || '·'}</span>
+      </div>`;
+  }).join('') : '';
+
+  $('s-spent').textContent = spent;
+  $('s-fast').textContent = fast.min;
+  const diff = spent - fast.min;
+  $('s-lede').innerHTML = !n ? ''
+    : diff > 0
+      ? `The quickest route finishes ${diff} minute${diff === 1 ? '' : 's'} sooner and leaves Trust ${sign(fast.g.trust)}, Signal ${sign(fast.g.signal)}, Standard ${sign(fast.g.standard)}.`
+      : `You took the quickest route. It leaves Trust ${sign(fast.g.trust)}, Signal ${sign(fast.g.signal)}, Standard ${sign(fast.g.standard)}.`;
+
+  $('s-strip').innerHTML = CASES.map((c, i) => {
+    const o = state.choices[i];
+    if (!o) return `<div class="strip__c is-skipped">
+        <span class="strip__n num">${c.n}</span>
+        <span class="strip__pips"></span><span class="strip__t num">—</span></div>`;
+    const pips = ['trust','signal','standard'].map(k => {
+      const v = o.d[k];
+      const h = 2 + Math.abs(v) / 3 * 15;
+      return `<span class="pip ${v > 0 ? 'is-gain' : v < 0 ? 'is-loss' : ''}" style="height:${h}px"></span>`;
+    }).join('');
+    return `<div class="strip__c">
+        <span class="strip__n num">${c.n}</span>
+        <span class="strip__pips">${pips}</span>
+        <span class="strip__t num">${o.min}m</span>
+      </div>`;
+  }).join('');
 
   $('s-notes').innerHTML =
     `<div class="notes__k">Facilitator · the fastest path</div>
@@ -1462,7 +1614,24 @@ function renderSummary(){
 
   show('summary');
   moveInstruments(false);
+  fitReadout();
 }
+
+/* Step the reading down until it fits its panel. Called after render and on
+   resize, so a long run never loses its last sentence off the bottom. */
+function fitReadout(){
+  const el = $('s-readout');
+  const box = el.closest('.panel');
+  if (!el || !box) return;
+  el.style.fontSize = '';
+  let size = parseFloat(getComputedStyle(el).fontSize);
+  let guard = 0;
+  while (box.scrollHeight > box.clientHeight + 1 && size > 12 && guard++ < 24){
+    size -= 0.5;
+    el.style.fontSize = size + 'px';
+  }
+}
+window.addEventListener('resize', () => { if (state.view === 'summary') fitReadout(); });
 
 /* ── profile ───────────────────────────────────────────────────────────── */
 function pickProfile(fast){

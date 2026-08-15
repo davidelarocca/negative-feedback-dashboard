@@ -6,16 +6,16 @@ Build the two files of the session, each self-contained and fully offline.
     python3 tools/build.py console      # just the console
     python3 tools/build.py deck         # just the deck
 
-  broken-loop.html        the feedback decision console (dark)
-  broken-loop-deck.html   the 22-slide presentation that wraps around it (light)
+  broken-loop.html        the feedback management dashboard (dark)
+  broken-loop-deck.html   the 25-slide presentation that wraps around it (light)
 
 Both inline every asset as a data URI, so neither can be separated from what
 it needs by being emailed, zipped or copied to a ship's laptop. Each build
 fails if any external reference survives into the output.
 
-  Poppins        Costa brand face, subset to Latin + Latin-Ext (both files)
-  IBM Plex Mono  eyebrows, sources and figures (deck only)
-  The Costa mark cropped to its content box and resized (console only)
+  Poppins        Costa brand face, subset to Latin + Latin-Ext — the only
+                 typeface in either file
+  The Costa mark cropped to its content box and resized (dashboard only)
 
 Regenerating the font subsets needs fonttools + brotli; tools/subset-fonts.py
 does that and is only needed if the set of weights changes.
@@ -38,7 +38,6 @@ LOGO_GLOBS = ["c_full_white_yellow*.png", "c_full_white*.png", "c_full_yellow*.p
 LOGO_HEIGHT = 144          # 3x the 48px rendered height, for retina/projector
 
 POPPINS = [("Poppins", w, f"Poppins-{w}.subset.woff2") for w in (300, 400, 600, 700)]
-PLEX = [("IBM Plex Mono", w, f"IBMPlexMono-{w}.subset.woff2") for w in (400, 600)]
 
 TARGETS = {
     "console": {
@@ -52,7 +51,7 @@ TARGETS = {
         "out": "broken-loop-deck.html",
         "parts": ["01-head.html", "02-css.html", "04-body.html"],
         "scripts": ["03-slides.js", "05-app.js"],
-        "fonts": POPPINS + PLEX,
+        "fonts": POPPINS,
         "logo": False,
     },
 }

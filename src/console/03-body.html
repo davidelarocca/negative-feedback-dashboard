@@ -24,9 +24,7 @@
     <div class="lockup">
       <img class="lockup__mark" src="/*__LOGO__*/" alt="Costa Crociere">
       <div class="lockup__text">
-        <div class="lead">Costa Crociere</div>
-        <div>Leadership Training</div>
-        <div>The Broken Loop<span class="dot dot--small"></span></div>
+        <div class="lead">Feedback Management Dashboard<span class="dot dot--small"></span></div>
       </div>
     </div>
 
@@ -89,46 +87,50 @@
         <div class="notes" id="q-notes"></div>
       </section>
 
-      <!-- ══ 4. SUMMARY ════════════════════════════════════════════════ -->
+      <!-- ══ 4. SUMMARY ════════════════════════════════════════════════
+           The three instruments lead. Time is present and still carries the
+           fastest-path comparison, but it no longer sets the headline. -->
       <section class="screen summary-screen" id="screen-summary" aria-label="Summary">
-        <h2 class="title-stack sum-head">
-          <span class="t1">What it cost</span>
-          <span class="t2">in minutes<span class="dot"></span></span>
-        </h2>
 
-        <!-- the closing argument of the whole session: each column carries
-             its own cost, so the trade is readable in one glance -->
-        <div class="verdict">
-          <div class="verdict__grid">
-            <div class="verdict__col">
-              <span class="verdict__k">You spent</span>
-              <span class="verdict__n num" id="s-spent">0</span>
-              <span class="verdict__u">minutes</span>
-              <div class="verdict__row" id="s-yours"></div>
-            </div>
-            <div class="verdict__div"></div>
-            <div class="verdict__col verdict__col--alt">
-              <span class="verdict__k">The fastest path</span>
-              <span class="verdict__n num" id="s-fast">0</span>
-              <span class="verdict__u">minutes</span>
-              <div class="verdict__row" id="s-fastg"></div>
+        <div class="kpis" id="s-kpis"></div>
+
+        <div class="sum-mid">
+          <div class="panel panel--read">
+            <div class="panel__k">How the feedback was processed</div>
+            <div class="profile__name" id="s-profile"></div>
+            <p class="readout" id="s-readout"></p>
+          </div>
+
+          <div class="panel">
+            <div class="panel__k">Diagnostics</div>
+            <div class="diag" id="s-diag"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel__k">Where the loop gave way</div>
+            <div class="breaks" id="s-breaks"></div>
+          </div>
+        </div>
+
+        <div class="sum-foot">
+          <div class="panel panel--time">
+            <div class="panel__k">Time</div>
+            <div class="timerow">
+              <div class="timerow__c">
+                <span class="timerow__n num" id="s-spent">0</span>
+                <span class="timerow__l">minutes spent</span>
+              </div>
+              <div class="timerow__c timerow__c--alt">
+                <span class="timerow__n num" id="s-fast">0</span>
+                <span class="timerow__l">fastest path</span>
+              </div>
+              <p class="timerow__d" id="s-lede"></p>
             </div>
           </div>
-          <p class="verdict__lede" id="s-lede"></p>
-        </div>
 
-        <div class="panel">
-          <div class="panel__k">Where the room landed</div>
-          <div class="strip" id="s-strip"></div>
-        </div>
-
-        <div class="panel">
-          <div class="profile__head">
-            <div>
-              <div class="panel__k">Profile</div>
-              <div class="profile__name" id="s-profile"></div>
-            </div>
-            <p class="profile__line" id="s-profile-line"></p>
+          <div class="panel">
+            <div class="panel__k">Where the room landed</div>
+            <div class="strip" id="s-strip"></div>
           </div>
         </div>
 

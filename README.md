@@ -8,11 +8,11 @@ Two files, two halves of one session:
 
 | File | Ground | Role |
 |---|---|---|
-| `broken-loop-deck.html` | light | 22 slides. Carries the argument. |
-| `broken-loop.html` | dark | The decision console. The checkpoint in the middle of it. |
+| `broken-loop-deck.html` | light | 25 slides. Carries the argument. |
+| `broken-loop.html` | dark | The Feedback Management Dashboard. The checkpoint in the middle of it. |
 
-The presenter runs the deck to slide 18, hands over to the console, plays the
-eight cases with the room answering out loud, and returns to the deck at slide 19.
+The presenter runs the deck to slide 20, hands over to the dashboard, plays the
+eight cases with the room answering out loud, and returns to the deck at slide 21.
 
 The contrast between the two is load-bearing: the light ground is the argument,
 the dark ground is where the room stops listening and starts deciding. They do
@@ -21,9 +21,9 @@ rhythm, inverted.
 
 ---
 
-# Part one — the console
+# Part one — the dashboard
 
-An interactive decision console. It is not a quiz. There is no answer key. Every
+An interactive decision dashboard. It is not a quiz. There is no answer key. Every
 choice moves three instruments, and no choice moves all three in the same
 direction for free. The point the console makes on its own, without stating it,
 is that **the fast option and the good option are different options, and the
@@ -80,12 +80,32 @@ their target and settle; that is the only motion in the console.
 **Loop Integrity** is a composite percentage: each gauge normalised against the
 ±3-per-case band it could have moved through, then averaged.
 
-**Time is the fourth variable and the most important one.** The summary compares
-the room's total against the fastest possible path through the same cases, and
-shows what that path costs on the three instruments. Through all eight cases the
-fastest route takes **17 minutes** and leaves Trust −5, Signal −8, Standard −11.
-That comparison is the largest element on the screen and the closing argument of
-the session.
+Each gauge carries a short description on screen, so the room never has to be
+told twice what it is looking at.
+
+**The summary leads with the three instruments**, at full size, with a written
+reading of how the feedback was actually processed. Four further dimensions sit
+behind that reading, because an average hides how a run was made:
+
+| Dimension | What it answers |
+|---|---|
+| Asked first | How often a question came before the verdict, counted only over the cases that offered one |
+| In front of others | How much of it happened where witnesses could see or hear |
+| Consistency | Whether one line was held, or the decisions swung case to case |
+| Where the loop gave way | Which of the five break points failed, and how often |
+
+The reading is assembled from the pattern rather than picked from a list of
+fixed verdicts, so two runs with the same profile still read differently. It is
+auto-fitted to its panel, so a long run never loses its last sentence.
+
+**Time is present but no longer the headline.** A supporting strip carries the
+room's total against the fastest possible path and what that path costs on the
+three instruments — through all eight cases the fastest route takes **17
+minutes** and leaves Trust −5, Signal −8, Standard −11. The trade is still
+there; it is no longer the first thing the room reads.
+
+The whole summary fits one screen at every supported size. There are no scroll
+containers anywhere in the dashboard.
 
 ## 4. The model
 
@@ -119,9 +139,9 @@ measurement rather than verdict — which is what the brief requires: *the
 instruments move; the console does not judge.*
 
 **Type** — Poppins throughout, subset to Latin + Latin-Ext and embedded as WOFF2
-data URIs (weights 300/400/600/700, ~36 KB total). Instrument read-outs use
-Poppins with tabular figures rather than importing a monospace that is not part
-of the Costa system.
+data URIs (weights 300/400/600/700, ~36 KB total). It is the only typeface in
+either file. Read-outs use Poppins with tabular figures rather than importing a
+monospace that is not part of the Costa system.
 
 The guideline's typographic rules are implemented as reusable classes:
 
@@ -218,13 +238,14 @@ the deck loads it for the handoff on slide 18.
 | `→` / `Space` / click | Advance one reveal step, then one slide |
 | `←` | Back |
 | `N` | Speaker notes |
+| `H` | Controls panel — every key, on screen |
 | `F` | Fullscreen |
 | `R` | Reset |
-| `Esc` | Return from the console · close the notes panel |
+| `Esc` | Return from the dashboard · close a panel |
 
-The presenter strip sits bottom-left with the slide counter and an elapsed clock
-that starts on the first key press. It is styled as part of the design because it
-is visible on the shared screen.
+The presenter strip sits bottom-left and carries only the slide counter and an
+elapsed clock that starts on the first key press. Key hints live behind `H`, so
+the shared screen never shows the audience instructions meant for the presenter.
 
 ## 9. The fixed canvas
 
@@ -234,16 +255,15 @@ and 1366×768 are therefore the same picture at two sizes — no reflow, no scro
 nothing the presenter did not rehearse. Nothing on any slide is below 18px inside
 that canvas.
 
-Two slides carry more than the base type scale fits in 720px, and the five
-break-point slides give 52px of their height to the rail. Rather than shrinking
-the whole deck to its worst case, those slides step down one density notch
-(`.tight` for the 07–11 run, so the sequence still reads as one; `.dense` for the
-heaviest standalone slides).
+Slides that carry more than the base type scale fits in 720px step down one
+density notch rather than shrinking the whole deck to its worst case: `.tight`
+for the 07–11 break-point run, so the sequence still reads as one, and `.dense`
+for the heaviest standalone slides.
 
 ## 10. The handoff
 
-Slide 18 hands over to the console, preferring the embedded route so the presenter
-never leaves the deck:
+Slide 20 hands over to the dashboard, preferring the embedded route so the
+presenter never leaves the deck:
 
 1. The console is preloaded into a hidden full-bleed iframe when the deck opens,
    so there is nothing left to load at the handoff.
@@ -251,44 +271,53 @@ never leaves the deck:
    over `postMessage` when it detects it is embedded. The deck waits for that
    handshake.
 3. On the handshake, the frame fades in and takes keyboard focus. `Esc` inside the
-   console posts back and the deck goes to slide 19.
+   dashboard posts back and the deck goes to slide 21.
 4. **If the handshake never arrives** the frame is not usable, so the deck opens
-   the console in a new tab instead of leaving a dead frame on screen. If the
+   the dashboard in a new tab instead of leaving a dead frame on screen. If the
    browser also blocks the popup, the slide says which file to open. `Esc` still
-   returns to slide 19.
+   returns to slide 21.
 
-The console is unchanged when run on its own: the bridge is guarded by
+The dashboard is unchanged when run on its own: the bridge is guarded by
 `window.parent !== window` and does nothing standalone.
 
 ## 11. The inversion
 
-Arriving at slide 18 the deck inverts from paper to the console's dark navy over
-700ms, all type crossfading with it; slide 19 inverts back on its first step. These
-are the only two full-screen transitions in the deck.
+Arriving at the handoff slide the deck inverts from paper to the dashboard's dark
+navy over 700ms, all type crossfading with it; the return slide inverts back on
+its first step. These are the only two full-screen transitions in the deck.
 
 The dark values *are* the console's values — `#00324A` ground, `#EBE9E8` type — so
 by the time the console appears the screen is already exactly its colour and there
 is nothing to see happening. Verified in-browser: deck ground and console ground
 both resolve to `rgb(0, 50, 74)`.
 
-The ground is derived from position (`slide 18`, or `slide 19 step 0`) rather than
-tracked as an event, so every route through it — forward, back, reset, returning
-from the console — lands on the right colour.
+The ground is derived from slide flags rather than slide numbers, so inserting a
+slide never moves it and every route through — forward, back, reset, returning
+from the dashboard — lands on the right colour.
 
 ## 12. Motion system
 
-Five effects, defined once and reused. Everything else stays still so the
-inversion lands.
+Two registers, defined once and reused. Prose is cinematic: it is revealed by a
+mask, never faded. Data is mechanical: it draws, plots and counts. Everything
+else stays still so the inversion lands.
 
 | Effect | Where |
 |---|---|
-| Rise-in | 12px up + fade, 420ms ease-out, staggered 80ms across a group |
-| Count-up | every statistic animates from zero over 900ms |
-| Rule-draw | hairlines and dividers draw left to right over 500ms |
-| The loop rail | slides 07–11: current break point in accent, passed ones dimmed, coming ones empty. Fades rather than cuts. |
-| The inversion | slides 18 and 19 only |
+| Mask reveal | Text rises from behind its own edge, 780ms on a heavy decelerating curve. The element clips; an inner span moves. |
+| Kinetic word split | Hero lines only. Each word carries its own mask and a 46ms offset, so the sentence assembles itself. |
+| Count-up | Every statistic animates from zero over 900ms |
+| Rule-draw | Hairlines and dividers draw left to right; the spiral's arcs draw segment by segment until the circle closes |
+| Lift | Cards, stats and rows rise 18px into place, staggered 90ms |
+| Slide entry | The ground rises 20px while the eyebrow tracks in from wider letter-spacing — two speeds, so arriving has depth |
+| The loop rail | Slides 07–11: current break point in accent and thickened, passed ones dimmed, coming ones empty. Fades rather than cuts. |
+| The inversion | The handoff and return slides only |
 
-`prefers-reduced-motion` reduces all of it to instant opacity changes.
+The engine applies these automatically: it walks each reveal step, masks the text
+leaves, leaves layout containers alone, and assigns the stagger. A flex or grid
+box is never treated as text, and a masked box never shrinks — either would clip
+a line in half.
+
+`prefers-reduced-motion` reduces all of it to instant state changes.
 
 ## 13. Deck palette
 
@@ -308,7 +337,19 @@ brand yellow for the positive figure, Costa dark amber `#C77706` for the negativ
 Alert `#C8503C` and signal `#3FA675` are used **once**, on slide 15, where the gap
 between 0% and 82% is the content rather than a decoration.
 
-Type is Poppins for prose and **IBM Plex Mono** for eyebrows, sources and figures.
-The mono is embedded rather than taken from a system stack: a system monospace
-renders differently on every machine, which would break the guarantee that the
-presenter sees what he rehearsed.
+Type is **Poppins only**, the same embedded subset the dashboard uses. Eyebrows,
+sources and figures are set in Poppins with tracking and tabular figures rather
+than a second typeface.
+
+## 14. The three new slides
+
+Slides 18, 19 and 22 connect the argument to the dashboard's instruments:
+
+| Slide | What it does |
+|---|---|
+| 18 · Three instruments | Defines Trust, Signal and Standard, and ties each to the loop points that decide it — Respect & Protect and Better Together hold Trust, Speak Up holds Signal, Listen & Learn and Always Improving hold Standard |
+| 19 · The trade | Three moves, three shapes of cost, shown as bar deltas. Only the third raises all three, and it is the only one that costs minutes |
+| 22 · What it buys | After the dashboard: delegation, cascading and time. The minutes just spent become an argument rather than a complaint |
+
+18 and 19 run immediately before the handoff, so the room knows what it is moving.
+22 lands after, when they have just felt the cost.

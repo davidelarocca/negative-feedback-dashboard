@@ -1,7 +1,7 @@
 
 /* ══════════════════════════════════════════════════════════════════════════
-   ENGINE — canvas scaling, reveals, the rail, the inversion, the handoff.
-   No presentation copy below this line.
+   ENGINE — canvas scaling, reveal primitives, the rail, the inversion,
+   the handoff. No presentation copy below this line.
    ══════════════════════════════════════════════════════════════════════════ */
 
 const $ = id => document.getElementById(id);
@@ -9,18 +9,15 @@ const REDUCED = window.matchMedia('(prefers-reduced-motion: reduce)');
 
 const CONSOLE_FILE = 'broken-loop.html';
 const INVERT_MS = 700;
+const WORD_MS = 46;        /* per-word delay in a kinetic split */
 
-let idx = 0;          /* slide index */
-let step = 0;         /* reveal step within the slide */
-let dark = false;     /* current ground */
-let notesOn = false;
+let idx = 0, step = 0;
+let dark = false, notesOn = false, helpOn = false;
 let startedAt = null;
 let consoleReady = false;
-let consoleMode = null;   /* null | 'frame' | 'tab' */
+let consoleMode = null;    /* null | 'frame' | 'tab' */
 
-/* ── 1. the design canvas ──────────────────────────────────────────────────
-   1280×720 scaled to the viewport, recalculated on load and on resize, so
-   1920×1080 and 1366×768 are the same picture at two sizes. */
+/* ── 1. the design canvas ────────────────────────────────────────────────── */
 function fit(){
   const s = Math.min(window.innerWidth / 1280, window.innerHeight / 720);
   $('canvas').style.transform = `translate(-50%,-50%) scale(${s})`;
@@ -28,7 +25,78 @@ function fit(){
 window.addEventListener('resize', fit);
 window.addEventListener('orientationchange', fit);
 
-/* ── 2. build ──────────────────────────────────────────────────────────── */
+/* ── 2. build + reveal preparation ───────────────────────────────────────────
+   Prose is masked: the element clips its own content and an inner span rises
+   from behind the edge. Objects lift as a group. Rules and arcs draw. Each
+   step's targets get an incremental --i so a group assembles rather than
+   arriving whole. */
+const INLINE = new Set(['SPAN','B','STRONG','EM','I','BR','SUP','SUB','A']);
+
+function isTextLeaf(el){
+  if (!el.textContent.trim()) return false;
+  if (el.namespaceURI === 'http://www.w3.org/2000/svg') return false;
+  /* A flex or grid box is a layout container even when every child is a
+     span. Masking it would collapse the row into a single block. */
+  const d = getComputedStyle(el).display;
+  if (d === 'flex' || d === 'grid' || d === 'inline-flex' || d === 'inline-grid') return false;
+  return [...el.children].every(c => INLINE.has(c.tagName));
+}
+
+function maskify(el){
+  if (el.dataset.masked) return;
+  el.dataset.masked = '1';
+  el.classList.add('masked');
+  const inner = document.createElement('span');
+  inner.className = 'rv';
+  while (el.firstChild) inner.appendChild(el.firstChild);
+  el.appendChild(inner);
+}
+
+/* Hero lines only: each word carries its own mask and delay, so the sentence
+   assembles itself left to right. */
+function splitWords(el){
+  const text = el.textContent;
+  el.textContent = '';
+  let n = 0;
+  text.split(/(\s+)/).forEach(tok => {
+    if (!tok) return;
+    if (!tok.trim()){ el.appendChild(document.createTextNode(tok)); return; }
+    const w = document.createElement('span'); w.className = 'w';
+    const i = document.createElement('i');
+    i.textContent = tok;
+    i.style.transitionDelay = (n++ * WORD_MS) + 'ms';
+    w.appendChild(i);
+    el.appendChild(w);
+  });
+}
+
+function prepare(root){
+  root.querySelectorAll('[data-step]').forEach(stepEl => {
+    let i = 0;
+    const assign = el => {
+      if (!el.style.getPropertyValue('--i')) el.style.setProperty('--i', i);
+      i++;
+    };
+    const take = el => {
+      if (el.dataset.split === 'words'){ splitWords(el); assign(el); return true; }
+      if (el.classList.contains('rule') || el.classList.contains('lift')
+          || el.classList.contains('sp-arc')){ assign(el); return true; }
+      if (isTextLeaf(el)){ maskify(el); assign(el); return true; }
+      return false;
+    };
+    const visit = node => {
+      for (const c of node.children){
+        if (c.hasAttribute('data-step')) continue;   /* another step owns it */
+        if (!take(c)) visit(c);
+      }
+    };
+    if (stepEl.dataset.split === 'words') splitWords(stepEl);
+    else if (stepEl.classList.contains('lift')) { /* lifts as one group */ }
+    else if (isTextLeaf(stepEl)) maskify(stepEl);
+    else visit(stepEl);
+  });
+}
+
 function build(){
   $('slides').innerHTML = SLIDES.map((s, i) => `
     <section class="slide${s.center ? ' is-center' : ''}${s.rail ? ' has-rail' : ''}${s.cls ? ' ' + s.cls : ''}"
@@ -39,9 +107,12 @@ function build(){
       <div class="rail__bar"></div>
       <div class="rail__lbl">${name}</div>
     </div>`).join('');
+
+  $('p-total').textContent = String(SLIDES.length).padStart(2, '0');
+  prepare($('slides'));
 }
 
-/* ── 3. reveals ────────────────────────────────────────────────────────── */
+/* ── 3. counting ─────────────────────────────────────────────────────────── */
 function countUp(node, animate){
   if (node.dataset.done === '1') return;
   node.dataset.done = '1';
@@ -68,11 +139,6 @@ function resetCounts(scope){
   });
 }
 
-function stagger(el){
-  const v = getComputedStyle(el).getPropertyValue('--i');
-  return (parseFloat(v) || 0) * 80;
-}
-
 function applyStep(slideEl, animate){
   slideEl.querySelectorAll('[data-step]').forEach(el => {
     const show = +el.dataset.step <= step;
@@ -80,41 +146,43 @@ function applyStep(slideEl, animate){
     el.classList.toggle('shown', show);
   });
 
-  /* elements that step aside once the argument has moved past them */
   slideEl.querySelectorAll('[data-until]').forEach(el => {
     el.classList.toggle('faded', step > +el.dataset.until);
   });
 
   slideEl.querySelectorAll('[data-step].shown').forEach(el => {
-    const delay = animate ? stagger(el) : 0;
+    const i = parseFloat(getComputedStyle(el).getPropertyValue('--i')) || 0;
     const nodes = el.matches('[data-count]') ? [el] : el.querySelectorAll('[data-count]');
     nodes.forEach(n => {
       if (n.dataset.done === '1') return;
+      const delay = animate ? i * 90 + 160 : 0;
       if (delay) setTimeout(() => countUp(n, animate), delay);
       else countUp(n, animate);
     });
   });
 }
 
-/* ── 4. the rail ───────────────────────────────────────────────────────── */
+/* ── 4. the rail ─────────────────────────────────────────────────────────── */
 function setRail(pos){
   const rail = $('rail');
   rail.classList.toggle('on', pos > 0);
   [...rail.children].forEach((seg, i) => {
     const n = i + 1;
-    const all = pos === 5;                       /* slide 11: all five lit */
+    const all = pos === 5;                       /* the last one lights all five */
     seg.classList.toggle('is-now',  all || n === pos);
     seg.classList.toggle('is-past', !all && n < pos);
   });
 }
 
-/* ── 5. the inversion ──────────────────────────────────────────────────────
-   The deck is dark from the moment it arrives at slide 18 until slide 19
-   takes its first step. Deriving it from position rather than tracking it
-   as an event means every route — forward, back, reset — lands correctly. */
+/* ── 5. the inversion ────────────────────────────────────────────────────────
+   Derived from slide flags rather than slide numbers, so inserting a slide
+   never moves it, and every route — forward, back, reset, returning from the
+   dashboard — lands on the right ground. */
 function wantsDark(i, s){
-  const n = SLIDES[i].n;
-  return n === '18' || (n === '19' && s === 0);
+  const sl = SLIDES[i];
+  if (sl.handoffAt) return true;          /* dark for the whole handoff slide */
+  if (sl.arriveDark) return s === 0;      /* dark on arrival, inverts on step 1 */
+  return false;
 }
 
 let invertTimer = null;
@@ -129,7 +197,7 @@ function setGround(next, animate){
   document.body.classList.toggle('is-dark', dark);
 }
 
-/* ── 6. navigation ─────────────────────────────────────────────────────── */
+/* ── 6. navigation ───────────────────────────────────────────────────────── */
 function render(animate){
   const s = SLIDES[idx];
   const slides = $('slides').children;
@@ -148,18 +216,21 @@ function go(i, s, animate = true){
   const prev = idx;
   idx = Math.max(0, Math.min(SLIDES.length - 1, i));
   step = s;
-  if (prev !== idx) resetCounts($('slides').children[idx]);
+  if (prev !== idx){
+    resetCounts($('slides').children[idx]);
+    /* restart the slide-entry motion */
+    const el = $('slides').children[idx];
+    el.style.animation = 'none'; void el.offsetWidth; el.style.animation = '';
+  }
   render(animate);
 }
 
-function setStep(s){
-  step = s;
-  render(true);
-}
+function setStep(s){ step = s; render(true); }
 
 function advance(){
   startClock();
-  if (consoleMode) return;                 /* the console has the floor */
+  if (consoleMode) return;                 /* the dashboard has the floor */
+  if (helpOn){ toggleHelp(); return; }
   const s = SLIDES[idx];
   if (step < s.steps){
     setStep(step + 1);
@@ -172,18 +243,12 @@ function advance(){
 function back(){
   startClock();
   if (consoleMode){ returnFromConsole(); return; }
+  if (helpOn){ toggleHelp(); return; }
   if (step > 0){ setStep(step - 1); return; }
-  if (idx > 0){
-    const prev = SLIDES[idx - 1];
-    go(idx - 1, prev.steps);
-  }
+  if (idx > 0) go(idx - 1, SLIDES[idx - 1].steps);
 }
 
-/* ── 7. the handoff ────────────────────────────────────────────────────────
-   Preferred route is the embedded frame, so the presenter never leaves the
-   deck. Local-file frames are cross-origin, so the console announces itself
-   with postMessage; if that handshake never arrives the frame is not usable
-   and we open the console in a tab instead rather than showing a dead frame. */
+/* ── 7. the handoff ──────────────────────────────────────────────────────── */
 window.addEventListener('message', e => {
   const d = e.data;
   if (!d || typeof d !== 'object') return;
@@ -196,53 +261,50 @@ function handoff(){
   if (consoleReady){
     consoleMode = 'frame';
     frame.classList.add('on');
-    $('p-hint').textContent = 'Esc returns to the deck';
     setTimeout(() => { try { frame.contentWindow.focus(); } catch (err) {} }, 80);
   } else {
-    /* The frame never announced itself, so it is not usable. Open the console
-       in a tab instead of leaving a dead frame on screen. */
+    /* The frame never announced itself, so it is not usable. Open the
+       dashboard in a tab rather than leaving a dead frame on screen. */
     consoleMode = 'tab';
-    $('p-hint').textContent = 'Esc returns to the deck';
     const win = window.open(CONSOLE_FILE, '_blank');
     if (!win){
-      /* Popup blocked — tell the presenter rather than failing silently. */
-      const note = document.getElementById('handoff-fallback');
+      const note = $('handoff-fallback');
       if (note) note.classList.add('on');
     }
   }
 }
 
 function returnFromConsole(){
-  const frame = $('console');
-  frame.classList.remove('on');
+  $('console').classList.remove('on');
   consoleMode = null;
-  $('p-hint').textContent = 'N notes · F full screen';
-  /* Slide 19 opens on the dark ground, which is the colour already on
-     screen, so nothing flashes as the console goes. */
-  go(SLIDES.findIndex(s => s.n === '19'), 0);
+  /* The slide that opens on the dark ground is the colour already on screen,
+     so nothing flashes as the dashboard goes. */
+  go(SLIDES.findIndex(s => s.arriveDark), 0);
   window.focus();
 }
 
-/* ── 8. presenter chrome ───────────────────────────────────────────────── */
+/* ── 8. presenter chrome ─────────────────────────────────────────────────── */
 function startClock(){
   if (startedAt) return;
   startedAt = Date.now();
   tickClock();
 }
-
 function tickClock(){
   if (!startedAt) return;
   const t = Math.floor((Date.now() - startedAt) / 1000);
   $('p-clock').textContent =
     String(Math.floor(t / 60)).padStart(2, '0') + ':' + String(t % 60).padStart(2, '0');
 }
-/* Sampled well inside the second so the displayed minute never lags the
-   real one on a shared screen. */
 setInterval(tickClock, 250);
 
 function toggleNotes(){
   notesOn = !notesOn;
   $('notes').classList.toggle('on', notesOn);
+}
+
+function toggleHelp(){
+  helpOn = !helpOn;
+  $('help').classList.toggle('on', helpOn);
 }
 
 function toggleFull(){
@@ -252,15 +314,15 @@ function toggleFull(){
 
 function reset(){
   if (consoleMode){ $('console').classList.remove('on'); consoleMode = null; }
-  $('p-hint').textContent = 'N notes · F full screen';
   startedAt = null;
   $('p-clock').textContent = '00:00';
   [...$('slides').children].forEach(resetCounts);
   notesOn = false; $('notes').classList.remove('on');
+  helpOn = false;  $('help').classList.remove('on');
   go(0, 0, false);
 }
 
-/* ── 9. input ──────────────────────────────────────────────────────────── */
+/* ── 9. input ────────────────────────────────────────────────────────────── */
 const NAV = [' ', 'Spacebar', 'ArrowRight', 'ArrowLeft', 'PageDown', 'PageUp'];
 
 document.addEventListener('keydown', e => {
@@ -272,26 +334,26 @@ document.addEventListener('keydown', e => {
   if (k === 'ArrowLeft'  || k === 'PageUp'){ back(); return; }
   if (k === 'Escape'){
     if (consoleMode) returnFromConsole();
+    else if (helpOn) toggleHelp();
     else if (notesOn) toggleNotes();
     return;
   }
   switch (k.toLowerCase()){
     case 'n': toggleNotes(); break;
+    case 'h': toggleHelp(); break;
     case 'f': toggleFull(); break;
     case 'r': reset(); break;
   }
 });
 
-/* Click advances, except on the notes panel and the presenter strip. */
 $('canvas').addEventListener('click', e => {
   if (e.target.closest('.notes') || e.target.closest('.presenter')) return;
+  if (e.target.closest('.help')){ toggleHelp(); return; }
   advance();
 });
 
-/* ── 10. boot ──────────────────────────────────────────────────────────── */
+/* ── 10. boot ────────────────────────────────────────────────────────────── */
 build();
 fit();
 render(false);
-
-/* Preload the console so the handoff has nothing left to load. */
 $('console').src = CONSOLE_FILE;

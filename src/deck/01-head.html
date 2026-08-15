@@ -6,66 +6,57 @@
 <title>The Broken Loop — Presentation</title>
 <style>
 /* ══════════════════════════════════════════════════════════════════════════
-   TYPE — embedded so the deck renders identically on any machine.
-   Poppins  · Costa brand face, SIL OFL 1.1
-   IBM Plex Mono · eyebrows, sources and figures, SIL OFL 1.1
+   TYPE — Poppins only, the Costa brand face, embedded so the deck renders
+   identically on any machine. SIL OFL 1.1.
    ══════════════════════════════════════════════════════════════════════════ */
 /*__FONTS__*/
 
 /* ══════════════════════════════════════════════════════════════════════════
    1. TOKENS
-   The same Costa palette as the console, inverted for a light ground. The
-   dark values ARE the console's values, so the inversion on slide 18 lands
-   on exactly the colour the console is already painted in.
+   The same Costa palette as the dashboard, inverted for a light ground. The
+   dark values ARE the dashboard's values, so the inversion at the handoff
+   lands on exactly the colour that screen is already painted in.
    ══════════════════════════════════════════════════════════════════════════ */
 :root{
-  /* brand constants — identical on both grounds */
   --accent:      #F9B000;   /* Costa yellow, Pantone 143 C */
   --costa-blue:  #0071A3;   /* Costa blue,   Pantone 7690 C */
 
-  /* direction of travel on statistics.
-     Amber is the default negative and keeps the deck inside the Costa
-     palette. Alert and signal are held back for slide 15, where the gap
-     between 0% and 82% is the content rather than a decoration. */
-  --down:        #C77706;   /* Costa dark amber */
-  --alert:       #C8503C;
+  --down:        #C77706;   /* Costa dark amber — the default negative */
+  --alert:       #C8503C;   /* held back for slide 15 only */
   --signal:      #3FA675;
 
   /* ── light ground ── */
   --paper:       #F7F4EF;
-  --ink:         #00324A;   /* Costa deep blue, set as type */
+  --ink:         #00324A;
   --ink-soft:    #124A63;
-  --mute:        #85888C;   /* Costa Cool Gray 8C */
+  --mute:        #85888C;
   --rule:        rgba(0,50,74,.20);
   --frame:       rgba(0,50,74,.16);
-  --panel:       rgba(0,50,74,.035);
 
   --sans: 'Poppins', 'Century Gothic', 'Avenir Next', 'Segoe UI', system-ui, sans-serif;
-  --mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, Consolas, monospace;
 
-  --t-rise: 420ms;
-  --t-rule: 500ms;
-  --t-count: 900ms;
+  --t-mask:   780ms;
+  --t-rule:   560ms;
   --t-invert: 700ms;
-  --ease-out: cubic-bezier(.22,.85,.3,1);
+  /* A heavy decelerating curve: fast out of the gate, long settle. This is
+     what separates a considered reveal from a PowerPoint fade. */
+  --ease-mask: cubic-bezier(.16, 1, .3, 1);
+  --ease-out:  cubic-bezier(.22, .85, .3, 1);
 }
 
-/* ── dark ground — the console's own palette ── */
 body.is-dark{
-  --paper:    #00324A;   /* === the console's ground */
+  --paper:    #00324A;   /* === the dashboard's ground */
   --ink:      #EBE9E8;
   --ink-soft: #C9D6DF;
   --mute:     #8DAAC9;
   --rule:     rgba(141,170,201,.30);
   --frame:    rgba(141,170,201,.26);
-  --panel:    rgba(141,170,201,.06);
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
    2. SHELL
    ══════════════════════════════════════════════════════════════════════════ */
 *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
-
 html,body{ height:100%; overflow:hidden; }
 
 body{
@@ -76,9 +67,7 @@ body{
   text-rendering:optimizeLegibility;
 }
 
-/* The inversion is the only time colour animates. The class is added for
-   its duration and removed again, so nothing else in the deck carries a
-   colour transition it did not ask for. */
+/* The inversion is the only time colour animates. */
 body.inverting,
 body.inverting .canvas *{
   transition:
@@ -89,10 +78,7 @@ body.inverting .canvas *{
     stroke           var(--t-invert) var(--ease-out) !important;
 }
 
-/* ── the fixed design canvas ──
-   Every slide is laid out inside 1280×720 and the whole thing is scaled to
-   the viewport, so 1920×1080 and 1366×768 are the same picture at two
-   sizes: no reflow, no scrolling, nothing the presenter did not rehearse. */
+/* Fixed 1280×720 design canvas, scaled to the viewport. */
 .viewport{ position:fixed; inset:0; overflow:hidden; background:var(--paper); }
 .canvas{
   position:absolute; left:50%; top:50%;
@@ -108,16 +94,19 @@ body.inverting .canvas *{
    3. TYPE SCALE — nothing below 18px inside the canvas
    ══════════════════════════════════════════════════════════════════════════ */
 .eyebrow{
-  font-family:var(--mono); font-size:18px; font-weight:400;
-  letter-spacing:.14em; text-transform:uppercase; color:var(--mute);
+  font-size:18px; font-weight:600; letter-spacing:.14em;
+  text-transform:uppercase; color:var(--mute);
 }
 .src{
-  font-family:var(--mono); font-size:18px; font-weight:400;
-  line-height:1.5; color:var(--mute); letter-spacing:.005em;
+  font-size:18px; font-weight:400; line-height:1.5;
+  color:var(--mute); letter-spacing:.005em;
 }
+/* Figures keep the brand face and hold their column with tabular numerals,
+   rather than importing a second typeface for the numbers. */
 .fig{
-  font-family:var(--mono); font-weight:600; font-variant-numeric:tabular-nums;
-  letter-spacing:-.02em; line-height:.9;
+  font-weight:700; font-variant-numeric:tabular-nums lining-nums;
+  font-feature-settings:"tnum" 1,"lnum" 1;
+  letter-spacing:-.035em; line-height:.9;
 }
 
 .display{ font-size:52px; font-weight:300; line-height:1.16; letter-spacing:-.02em; }
@@ -125,50 +114,88 @@ body.inverting .canvas *{
 .title{    font-size:88px; font-weight:700; line-height:1;    letter-spacing:-.035em; }
 .lead{     font-size:30px; font-weight:300; line-height:1.45; }
 .body{     font-size:26px; font-weight:300; line-height:1.5;  color:var(--ink-soft); }
-.small{    font-size:22px; font-weight:300; line-height:1.45; color:var(--ink-soft); }
 
 .accent{ color:var(--accent); }
 .down{ color:var(--down); }
 b,strong{ font-weight:600; }
 
-/* The yellow dot from the Costa guideline, carried over from the console. */
 .dot{
   display:inline-block; width:.23em; height:.23em; border-radius:50%;
   background:var(--accent); vertical-align:baseline; margin-left:.06em;
 }
 
 /* ══════════════════════════════════════════════════════════════════════════
-   4. MOTION SYSTEM — five effects, defined once, reused everywhere
+   4. MOTION SYSTEM
+   Two registers, defined once and reused. Prose is cinematic: it is revealed
+   by a mask, never faded. Data is mechanical: it draws, plots and counts.
+   Everything else stays still so the inversion lands.
    ══════════════════════════════════════════════════════════════════════════ */
 
-/* 4.1 Rise-in — 12px up, opacity, 420ms, staggered 80ms across a group. */
-[data-step]{
-  opacity:0;
-  transform:translateY(12px);
-  transition:
-    opacity   var(--t-rise) var(--ease-out),
-    transform var(--t-rise) var(--ease-out);
+/* Steps gate instantly — the motion belongs to the primitives below, not to
+   the container, so nothing double-animates. */
+[data-step]{ visibility:hidden; }
+[data-step].shown{ visibility:visible; }
+
+/* ── 4.1 Mask reveal ──
+   Text rises from behind its own edge. The overflow clip is the mask; the
+   inner span is what moves. Padding/negative-margin keeps descenders whole. */
+.masked{ display:block; overflow:hidden; padding-bottom:.16em; margin-bottom:-.16em; }
+/* A masked box clips its own text, so it must never be squashed by a flex
+   parent — that would silently cut the line in half. */
+.masked, .slide > *{ flex-shrink:0; }
+.masked > .rv{
+  display:block;
+  transform:translateY(112%);
+  transition:transform var(--t-mask) var(--ease-mask);
   transition-delay:0ms;
 }
-[data-step].shown{
-  opacity:1;
-  transform:none;
-  transition-delay:calc(var(--i, 0) * 80ms);
-}
+.shown .masked > .rv,
+.shown.masked > .rv{ transform:none; transition-delay:calc(var(--i, 0) * 90ms); }
 
-/* 4.3 Rule-draw — hairlines draw left to right rather than appearing. */
+/* ── 4.2 Word-level kinetic split ──
+   Reserved for hero lines. Each word carries its own mask and delay, so the
+   sentence assembles itself rather than arriving whole. */
+.w{ display:inline-block; overflow:hidden; vertical-align:top; padding-bottom:.16em; margin-bottom:-.16em; }
+.w > i{
+  display:inline-block; font-style:inherit;
+  transform:translateY(112%);
+  transition:transform var(--t-mask) var(--ease-mask);
+}
+.shown .w > i{ transform:none; }
+
+/* ── 4.3 Rule-draw ── hairlines draw rather than appear. */
 .rule{
   height:1px; width:100%; background:var(--rule);
   transform:scaleX(0); transform-origin:0 50%;
-  transition:transform var(--t-rule) var(--ease-out);
+  transition:transform var(--t-rule) var(--ease-mask);
 }
 .rule--v{ width:1px; height:100%; transform:scaleY(0); transform-origin:50% 0; }
-[data-step].shown .rule,
-.rule[data-step].shown{ transform:scaleX(1); }
-[data-step].shown .rule--v,
-.rule--v[data-step].shown{ transform:scaleY(1); }
+.shown .rule, .rule.shown{ transform:scaleX(1); }
+.shown .rule--v, .rule--v.shown{ transform:scaleY(1); }
 
-/* 4.4 The loop rail — slides 07 to 11 only, fades rather than cuts. */
+/* ── 4.4 Objects — boxes, stats and cells lift into place, staggered. */
+.lift{
+  transform:translateY(18px); opacity:0;
+  transition:transform 620ms var(--ease-mask), opacity 420ms var(--ease-out);
+}
+.shown .lift, .lift.shown{
+  transform:none; opacity:1;
+  transition-delay:calc(var(--i, 0) * 90ms);
+}
+
+/* ── 4.5 Slide entry — the ground shifts, and the eyebrow tracks in.
+   Two speeds, so arriving on a slide has depth without anything sliding
+   across the screen. */
+.slide.is-active{ animation:slide-rise 620ms var(--ease-mask) both; }
+@keyframes slide-rise{ from{ transform:translateY(20px) } to{ transform:none } }
+
+.slide.is-active .eyebrow{ animation:track-in 900ms var(--ease-mask) both; }
+@keyframes track-in{
+  from{ letter-spacing:.34em; opacity:0 }
+  to  { letter-spacing:.14em; opacity:1 }
+}
+
+/* ── 4.6 The loop rail — slides 07 to 11, fades rather than cuts. */
 .rail{
   position:absolute; left:64px; right:64px; top:44px;
   display:flex; gap:0; align-items:flex-start;
@@ -178,30 +205,29 @@ b,strong{ font-weight:600; }
 .rail.on{ opacity:1; }
 .rail__seg{ flex:1 1 0; display:flex; flex-direction:column; gap:10px; min-width:0; }
 .rail__bar{
-  height:3px; background:var(--frame);
-  transition:background-color 420ms var(--ease-out);
+  height:3px; background:var(--frame); transform-origin:0 50%;
+  transition:background-color 420ms var(--ease-out), transform 520ms var(--ease-mask);
 }
 .rail__seg + .rail__seg .rail__bar{ margin-left:6px; }
 .rail__lbl{
-  font-family:var(--mono); font-size:18px; letter-spacing:.06em;
+  font-size:18px; font-weight:600; letter-spacing:.06em;
   color:var(--frame); white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
   transition:color 420ms var(--ease-out);
 }
 .rail__seg + .rail__seg .rail__lbl{ margin-left:6px; }
 .rail__seg.is-past .rail__bar{ background:var(--rule); }
 .rail__seg.is-past .rail__lbl{ color:var(--mute); }
-.rail__seg.is-now  .rail__bar{ background:var(--accent); }
+.rail__seg.is-now  .rail__bar{ background:var(--accent); transform:scaleY(1.7); }
 .rail__seg.is-now  .rail__lbl{ color:var(--accent); }
 
-/* 4.5 The inversion is handled by the token swap above. */
-
-/* Reduced motion: everything collapses to an instant opacity change. */
+/* ── Reduced motion: every primitive collapses to an instant state change. */
 @media (prefers-reduced-motion:reduce){
-  [data-step]{ transform:none; transition:opacity .001ms; transition-delay:0ms !important; }
-  [data-step].shown{ transform:none; }
-  .rule{ transform:scaleX(1); transition:none; }
-  .rule--v{ transform:scaleY(1); }
+  .masked > .rv, .w > i{ transform:none !important; transition:none !important; }
+  .rule{ transform:scaleX(1) !important; transition:none !important; }
+  .rule--v{ transform:scaleY(1) !important; }
+  .lift{ transform:none !important; opacity:1 !important; transition:none !important; }
+  .slide.is-active, .slide.is-active .eyebrow{ animation:none !important; }
   body.inverting, body.inverting .canvas *{ transition-duration:.001ms !important; }
-  .rail{ transition:none; }
-  .rail__bar,.rail__lbl{ transition:none; }
+  .rail, .rail__bar, .rail__lbl{ transition:none !important; }
+  .rail__seg.is-now .rail__bar{ transform:none; }
 }

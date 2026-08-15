@@ -14,11 +14,15 @@ const LOOP_POINTS = [
 
 const ALL = LOOP_POINTS.map(p => p.id);
 
-/* Captions are kept to a single line at every supported width. */
+/* note — the one-line caption under each gauge, kept to a single line at
+   every supported width.  desc — the fuller definition on the summary. */
 const GAUGES = [
-  { id:'trust',    name:'Trust',    note:'the person in front of you' },
-  { id:'signal',   name:'Signal',   note:'will they tell you next time' },
-  { id:'standard', name:'Standard', note:'does the behaviour change' }
+  { id:'trust',    name:'Trust',    note:'the person in front of you',
+    desc:'What the conversation cost the person in front of you.' },
+  { id:'signal',   name:'Signal',   note:'will they tell you next time',
+    desc:'Whether they will bring you the next problem, or handle it quietly.' },
+  { id:'standard', name:'Standard', note:'does the behaviour change',
+    desc:'Whether the behaviour actually changes after the conversation.' }
 ];
 
 const CASES = [
@@ -29,7 +33,7 @@ const CASES = [
     setup:'Third spot check this month. Same section, same gaps: waste not segregated, sanitizer log not filled in. The section is run by a Sous Chef who reports to the Executive Chef, your peer under the same Director. Two crew are working two metres away.',
     question:'What do you do first',
     options:[
-      { id:'A', label:'Correct on the spot',
+      { id:'A', label:'Correct on the spot', audience:true,
         text:'Correct the Sous Chef on the spot, in the section, so the crew see the standard is not negotiable.',
         d:{trust:-2, signal:-2, standard:1}, min:1,
         breaks:['respect','speakup'],
@@ -44,7 +48,7 @@ const CASES = [
         d:{trust:1, signal:0, standard:2}, min:3,
         breaks:['listen'],
         conseq:'Right place, right facts, right tone. But you delivered a verdict without asking why this same gap keeps appearing in this same section, and you left without agreeing what changes. This is the version most managers believe is good practice, and it is the one that quietly repeats.' },
-      { id:'D', label:'Aside, ask, agree, brief',
+      { id:'D', label:'Aside, ask, agree, brief', asks:true,
         text:'Take him aside, name the specific gap, ask what makes this section harder to keep compliant than the others, agree one change and a check date. Brief the Executive Chef afterwards so he is not surprised.',
         d:{trust:2, signal:2, standard:3}, min:6,
         holds:ALL,
@@ -64,7 +68,7 @@ const CASES = [
         d:{trust:-3, signal:-1, standard:0}, min:5,
         breaks:['listen','respect'],
         conseq:'You have built an accusation out of a correlation and delivered it to the person with the most to lose. Whatever the truth is, you will not hear it now. If he is innocent you have damaged your best performer. If he is not, you have warned him.' },
-      { id:'B', label:'Brief all four together',
+      { id:'B', label:'Brief all four together', audience:true,
         text:'Brief all four together on pour standards and stock discipline, without mentioning the variance.',
         d:{trust:-1, signal:-1, standard:0}, min:5,
         breaks:['respect','speakup'],
@@ -73,7 +77,7 @@ const CASES = [
         text:'Escalate to the F&B Director and let the process handle it. Say nothing to the team.',
         d:{trust:0, signal:-1, standard:1}, min:2,
         conseq:'Defensible, and in a genuine misconduct case this is correct. But you have skipped the step that would tell you whether this is misconduct at all. If it turns out to be a broken stock-count procedure, you have escalated your own team over a spreadsheet error.' },
-      { id:'D', label:'Check the process first',
+      { id:'D', label:'Check the process first', asks:true,
         text:'Check the process before the people. Pull the count method, the transfer records, the shift pattern. If the variance survives that, open with facts and a question rather than a conclusion.',
         d:{trust:2, signal:3, standard:3}, min:30,
         holds:['listen','speakup'],
@@ -89,7 +93,7 @@ const CASES = [
     setup:'An excursion departed forty minutes late. Coaches were booked to the published time; the operations team worked from an updated time that was never circulated back. Guests waited on the pier. The team is back on board and visibly rattled. Complaints are already logged. It is 18:00 and the team goes off shift at 19:00.',
     question:'What do you do',
     options:[
-      { id:'A', label:'Debrief now, establish who',
+      { id:'A', label:'Debrief now, establish who', audience:true,
         text:'Debrief the whole team now while it is fresh, and establish who changed the time.',
         d:{trust:-2, signal:-2, standard:1}, min:20,
         breaks:['listen','together'],
@@ -103,7 +107,7 @@ const CASES = [
         text:'Stop the operational bleeding first. Confirm tomorrow’s timings in writing with everyone tonight, and hold the conversation about what happened tomorrow morning.',
         d:{trust:2, signal:2, standard:2}, min:10,
         conseq:'You have separated the fix from the lesson, which is the right order while guests are still affected and the team is still hot. The risk is that tomorrow morning never arrives. This is exactly how a fix becomes a substitute for learning.' },
-      { id:'D', label:'Two conversations tonight',
+      { id:'D', label:'Two conversations tonight', asks:true,
         text:'Speak tonight, individually, to the two people closest to the handover. Ask each what they were working from. Bring the team together tomorrow with the sequence already established.',
         d:{trust:2, signal:3, standard:3}, min:25,
         conseq:'You get the facts before the story sets, and nobody has to defend themselves in front of the group. The team meeting then becomes a conversation about the process, which is where it belongs.' }
@@ -126,11 +130,11 @@ const CASES = [
         text:'Say nothing yet. Six weeks is short and the previous six months were strong.',
         d:{trust:0, signal:0, standard:-2}, min:0,
         conseq:'Patience without inquiry is not patience, it is delay. If the cause is structural it compounds while you wait. If the cause is personal, your silence reads as indifference.' },
-      { id:'C', label:'Ask what changed',
+      { id:'C', label:'Ask what changed', asks:true,
         text:'Ask what has changed in the last six weeks, before looking at the numbers together.',
         d:{trust:3, signal:3, standard:2}, min:20,
         conseq:'Six weeks of decline after six months of delivery is almost never a competence signal. Something changed: a supplier, a staffing level, an itinerary, a person. The question finds it. The target does not.' },
-      { id:'D', label:'What the numbers do not show',
+      { id:'D', label:'What the numbers do not show', asks:true,
         text:'Bring the numbers and ask him to walk you through what they are not showing.',
         d:{trust:2, signal:3, standard:3}, min:20,
         conseq:'You have made the data a shared object rather than a verdict, and explicitly invited the information the report cannot carry. He is still accountable, because he is still explaining his own numbers.' }
@@ -182,7 +186,7 @@ const CASES = [
         text:'Handle it yourself with the guest, close the loop with the HGM, say nothing to her.',
         d:{trust:1, signal:-1, standard:-2}, min:20,
         conseq:'You protected her from a bad hour and denied her the information she needed. She will find out anyway, from someone else, and that version will be worse than the one you would have given her.' },
-      { id:'C', label:'Ask what happened first',
+      { id:'C', label:'Ask what happened first', asks:true,
         text:'Ask her what happened before you say anything about the complaint. Then decide.',
         d:{trust:3, signal:3, standard:2}, min:15,
         conseq:'A competent person with no history and a bad outcome is a question, not a verdict. You may find a guest who was already impossible, a system that failed her, or a genuine lapse. All three need a different response and you cannot tell which you have until you ask.' },
@@ -212,7 +216,7 @@ const CASES = [
         text:'Say nothing. The event happened, the guests were served, and the cost of the argument exceeds the cost of the failure.',
         d:{trust:0, signal:-2, standard:-3}, min:0,
         conseq:'Guaranteed to repeat, at a larger event, with less time. The absence of an owner is exactly why nobody else will raise it if you do not.' },
-      { id:'D', label:'Build the timeline together',
+      { id:'D', label:'Build the timeline together', asks:true,
         text:'Bring the three together and reconstruct the sequence with times, before anyone gives an account. Then agree who holds the handover next time.',
         d:{trust:2, signal:3, standard:3}, min:45,
         conseq:'A timeline is not an accusation, so people can contribute to it without defending themselves. Once the sequence is visible the gap is obvious, and ownership becomes an answer rather than a contest.' }
@@ -227,7 +231,7 @@ const CASES = [
     setup:'Another Director’s team has twice acted inside an area where your responsibilities overlap. The split has never been written down. It has cost you rework both times. You have no authority over him and you will work alongside him for the next four months.',
     question:'How do you raise it',
     options:[
-      { id:'A', label:'At the Directors’ meeting',
+      { id:'A', label:'At the Directors’ meeting', audience:true,
         text:'Raise it at the next Directors’ meeting, so it is on the record with everyone present.',
         d:{trust:-3, signal:-2, standard:1}, min:5,
         breaks:['respect','together'],
