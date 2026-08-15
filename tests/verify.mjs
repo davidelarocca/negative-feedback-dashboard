@@ -215,10 +215,10 @@ console.log('\nDECK');
   }));
   check('Poppins is the only typeface', meta.fonts.length === 1 && meta.fonts[0] === 'Poppins', meta.fonts.join(','));
   check('Poppins actually loaded, so line breaks are the designed ones', meta.loaded);
-  check('25 slides', meta.total === '25', meta.total);
+  check('23 slides', meta.total === '23', meta.total);
   check('canvas scales exactly 1.5x at 1920', meta.transform.includes('scale(1.5)'), meta.transform);
   check('presenter strip carries no key hints', !/notes|full screen/i.test(meta.strip), meta.strip);
-  check('mask reveals are wired', meta.masked > 100, String(meta.masked));
+  check('mask reveals are wired', meta.masked > 80, String(meta.masked));
   check('kinetic word splits are wired', meta.words > 20, String(meta.words));
 
   await press(p, 'h', 400);
@@ -267,7 +267,7 @@ console.log('\nDECK · every slide fits 1280x720');
 
   const rails = {};
   let worstType = Infinity;
-  for (let n = 0; n < 25; n++) {
+  for (let n = 0; n < 23; n++) {
     const id = await probe();
     if (id.console) { await press(p, 'Escape', 350); continue; }
     for (let g = 0; g < 14; g++) {                       // reveal the whole slide
@@ -290,8 +290,8 @@ console.log('\nDECK · every slide fits 1280x720');
   }
   check('nothing below 18px inside the canvas', worstType >= 18, `${worstType}px`);
   check('the loop rail advances in order',
-    rails['07'] === 'N....' && rails['08'] === 'pN...' && rails['09'] === 'ppN..' &&
-    rails['10'] === 'pppN.' && rails['11'] === 'NNNNN', JSON.stringify(rails));
+    rails['06'] === 'N....' && rails['07'] === 'pN...' && rails['08'] === 'ppN..' &&
+    rails['09'] === 'pppN.' && rails['10'] === 'NNNNN', JSON.stringify(rails));
   check('deck makes no external request', p.external.length === 0, p.external.join(','));
   check('deck runs without errors', p.errors.length === 0, p.errors.join(' | '));
   await p.close();
@@ -342,7 +342,7 @@ console.log('\nHANDOFF');
 console.log('\nONE FILE');
 {
   const p = await open(SESSION, { width: 1920, height: 1080 });
-  check('one file, 25 slides', await p.evaluate(() => document.getElementById('p-total').textContent) === '25');
+  check('one file, 23 slides', await p.evaluate(() => document.getElementById('p-total').textContent) === '23');
 
   for (let g = 0; g < 220; g++) {
     if (await p.evaluate(() => document.getElementById('console').classList.contains('on'))) break;
@@ -381,6 +381,32 @@ console.log('\nONE FILE');
       gone: !document.getElementById('console').classList.contains('on')
     }));
     check('Esc hands back to the deck', back.gone && back.dark, JSON.stringify(back));
+
+    /* Esc pressed the instant the dashboard appears — a mis-press, or the
+       presenter realising they opened it a slide too early. The frame is
+       focused on a short timer; if the return does not cancel it, focus lands
+       in a hidden frame and the deck stops answering the keyboard entirely. */
+    await press(p, 'r', 700);                         /* back to the top of the deck */
+    let reopened = false;
+    /* A 50ms poll notices the dashboard while the deck is still inside the
+       short window before it hands the frame the keyboard, so the Esc below
+       races that timer. A slower poll always arrives after it and never
+       reproduces the freeze. */
+    for (let g = 0; g < 260; g++) {
+      if (await p.evaluate(() => document.getElementById('console').classList.contains('on'))) { reopened = true; break; }
+      await press(p, 'ArrowRight', 50);
+    }
+    check('the handoff reopens on a second pass', reopened);
+    await p.keyboard.press('Escape');
+    await p.waitForTimeout(400);
+    const focus = await p.evaluate(() => document.activeElement.id || document.activeElement.tagName);
+    check('returning from the dashboard puts the keyboard back on the deck',
+      focus !== 'console', `focus left in the hidden frame (${focus})`);
+
+    const before = await p.evaluate(() => document.getElementById('p-n').textContent);
+    for (let g = 0; g < 6; g++) await press(p, 'ArrowRight', 260);
+    const after = await p.evaluate(() => document.getElementById('p-n').textContent);
+    check('the deck still answers the keyboard after returning', after !== before, `stuck on ${before}`);
   }
   check('one file makes no external request', p.external.length === 0, p.external.join(','));
   check('one file runs without errors', p.errors.length === 0, p.errors.join(' | '));

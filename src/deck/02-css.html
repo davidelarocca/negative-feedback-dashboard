@@ -38,7 +38,7 @@
 .dense .pair        { gap:56px; }
 .dense .pair__n     { font-size:64px; }
 .dense .pair__l     { font-size:20px; max-width:250px; }
-.dense .trade__r    { padding:11px 0; }
+.dense .trade__r    { padding:8px 0; }
 .dense .trade__n    { font-size:23px; }
 .dense .trade__t    { font-size:20px; flex-basis:84px; }
 .dense .mk          { width:82px; }
@@ -46,11 +46,20 @@
 .dense .buys        { gap:16px; }
 .dense .buys__d     { font-size:22px; }
 .dense .buys__k     { font-size:26px; flex-basis:220px; }
+.dense .waste       { flex-basis:152px; }
+.dense .waste__hd   { flex-basis:152px; }
+.dense .waste__k    { font-size:18px; }
+.dense .effects__t  { font-size:23px; }
+.dense .vars__d     { font-size:20px; }
 
 .stack   { display:flex; flex-direction:column; }
 .gap-xs  { gap:12px; }  .gap-s{ gap:20px; }  .gap-m{ gap:32px; }
 .gap-l   { gap:48px; }  .gap-xl{ gap:64px; }
 .push    { margin-top:auto; }
+/* A stack that takes the leftover height, so the .push inside it can pin the
+   closing rule to the floor of the canvas instead of trailing the content.
+   Beats the blanket `.slide > *{flex-shrink:0}` on specificity. */
+.slide > .fill{ flex:1 1 auto; min-height:0; }
 .mw-sm{ max-width:720px; }  .mw-md{ max-width:900px; }  .mw-lg{ max-width:1040px; }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -86,7 +95,10 @@
   padding-right:16px;
 }
 .data-row__v{ font-size:44px; }
-.data-row__k{ font-size:18px; font-weight:400; letter-spacing:.04em; color:var(--mute); white-space:nowrap; }
+.data-row__k{
+  display:flex; align-items:center; gap:8px;
+  font-size:18px; font-weight:400; letter-spacing:.04em; color:var(--mute); white-space:nowrap;
+}
 
 .spiral{ display:flex; gap:64px; align-items:center; }
 .spiral__svg{ flex:0 0 300px; width:300px; height:300px; }
@@ -158,10 +170,84 @@
 .trade__t{ flex:0 0 96px; text-align:right; font-size:22px; font-weight:600; color:var(--ink); }
 @media (prefers-reduced-motion:reduce){ .mk__fill{ transition:none; } }
 
+/* ── concept marks ──
+   Thin line icons, one idea each. They take their colour from the ground, so
+   they invert with everything else and never need a second version. */
+.ico{ flex:0 0 auto; width:32px; height:32px; color:var(--costa-blue); }
+.ico--lg{ width:44px; height:44px; }
+body.is-dark .ico{ color:var(--accent); }
+
+/* one conversation, three effects */
+.effects{ display:flex; flex-direction:column; gap:22px; }
+.effects__r{
+  display:flex; gap:24px; align-items:center;
+  padding:20px 0 20px 26px; border-left:3px solid var(--frame);
+}
+.effects__r:nth-child(1){ border-left-color:var(--accent); }
+.effects__r:nth-child(2){ border-left-color:var(--costa-blue); }
+.effects__r:nth-child(3){ border-left-color:var(--down); }
+.effects__r .ico{ width:36px; height:36px; }
+.effects__t{ flex:1 1 auto; font-size:26px; font-weight:300; line-height:1.4; color:var(--ink-soft); }
+
+/* the two variables the cycle does not see.
+   The icon sits on the key's baseline rather than above it: a stacked mark
+   costs a whole row of height, and this slide has none to spare. */
+.vars{ display:flex; gap:40px; }
+.vars__c{
+  flex:1 1 0; display:flex; flex-direction:column; gap:12px;
+  padding:28px 30px; border:1px solid var(--frame); border-radius:3px;
+}
+.vars__h{ display:flex; align-items:center; gap:16px; min-height:44px; }
+.vars__h .ico{ width:40px; height:40px; }
+.vars__k{ font-size:32px; font-weight:700; letter-spacing:-.02em; }
+.vars__d{ font-size:22px; font-weight:300; line-height:1.45; color:var(--ink-soft); }
+
+/* flag chips for the power-distance row */
+.flag{
+  display:block; width:30px; height:20px; border-radius:2px;
+  box-shadow:0 0 0 1px var(--frame) inset;
+}
+
+/* time wasted, in place of minutes: three bars, filled by severity */
+/* Wide enough that "TIME WASTED" sets on one line — the label may not shrink
+   below 18px, so the column gives way instead. */
+.waste{ flex:0 0 152px; display:flex; flex-direction:column; align-items:flex-end; gap:7px; }
+.waste__hd{
+  flex:0 0 152px; text-align:right;
+  font-size:18px; font-weight:600; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--mute);
+}
+.waste__bars{ display:flex; gap:4px; align-items:flex-end; height:22px; }
+.waste__bars i{
+  display:block; width:13px; background:var(--frame); border-radius:1px;
+  transform:scaleY(.25); transform-origin:50% 100%;
+  transition:transform 560ms var(--ease-mask), background-color 400ms var(--ease-out);
+}
+.waste__bars i:nth-child(1){ height:10px; }
+.waste__bars i:nth-child(2){ height:16px; }
+.waste__bars i:nth-child(3){ height:22px; }
+.waste__k{ font-size:20px; font-weight:600; letter-spacing:.02em; }
+.shown .waste__bars i{ transform:scaleY(1); }
+.waste--low  .waste__bars i:nth-child(1){ background:var(--signal); }
+.waste--low  .waste__k{ color:var(--signal); }
+.waste--mid  .waste__bars i:nth-child(-n+2){ background:var(--accent); }
+.waste--mid  .waste__k{ color:var(--accent); }
+.waste--high .waste__bars i{ background:var(--down); }
+.waste--high .waste__k{ color:var(--down); }
+.trade__hd{ display:flex; align-items:center; gap:28px; padding-bottom:6px; }
+@media (prefers-reduced-motion:reduce){ .waste__bars i{ transition:none; transform:scaleY(1); } }
+
+/* the closing line, alone on the screen */
+.closing{ font-size:62px; font-weight:700; line-height:1.16; letter-spacing:-.03em; }
+
 /* ── what it buys (new) ── */
 .buys{ display:flex; flex-direction:column; gap:22px; }
 .buys__r{ display:flex; gap:28px; align-items:flex-start; padding-left:24px; border-left:3px solid var(--accent); }
-.buys__k{ flex:0 0 250px; font-size:28px; font-weight:600; letter-spacing:-.01em; }
+.buys__k{
+  flex:0 0 250px; font-size:28px; font-weight:600; letter-spacing:-.01em;
+  display:flex; align-items:center; gap:14px;
+}
+.buys__k .ico{ width:28px; height:28px; }
 .buys__d{ flex:1 1 auto; font-size:24px; font-weight:300; line-height:1.45; color:var(--ink-soft); }
 
 /* ══════════════════════════════════════════════════════════════════════════

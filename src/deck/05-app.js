@@ -28,6 +28,7 @@ let dark = false, notesOn = false, helpOn = false;
 let startedAt = null;
 let consoleReady = false;
 let consoleMode = null;    /* null | 'frame' | 'tab' */
+let consoleFocusTimer = null;
 
 /* ── 1. the design canvas ────────────────────────────────────────────────── */
 function fit(){
@@ -273,7 +274,15 @@ function handoff(){
   if (consoleReady){
     consoleMode = 'frame';
     frame.classList.add('on');
-    setTimeout(() => { try { frame.contentWindow.focus(); } catch (err) {} }, 80);
+    /* Deferred so the frame is on screen before it takes the keyboard. If Esc
+       lands inside that window the return cancels this, otherwise it fires
+       into a hidden frame and every later key press goes there instead of to
+       the deck — which looks, from the lectern, like the deck has frozen. */
+    consoleFocusTimer = setTimeout(() => {
+      consoleFocusTimer = null;
+      if (consoleMode !== 'frame') return;
+      try { frame.contentWindow.focus(); } catch (err) {}
+    }, 80);
   } else {
     /* The frame never announced itself, so it is not usable. Open the
        dashboard in a tab rather than leaving a dead frame on screen. In the
@@ -293,6 +302,7 @@ function handoff(){
 }
 
 function returnFromConsole(){
+  if (consoleFocusTimer){ clearTimeout(consoleFocusTimer); consoleFocusTimer = null; }
   $('console').classList.remove('on');
   consoleMode = null;
   /* The slide that opens on the dark ground is the colour already on screen,

@@ -298,7 +298,7 @@ b,strong{ font-weight:600; }
 .dense .pair        { gap:56px; }
 .dense .pair__n     { font-size:64px; }
 .dense .pair__l     { font-size:20px; max-width:250px; }
-.dense .trade__r    { padding:11px 0; }
+.dense .trade__r    { padding:8px 0; }
 .dense .trade__n    { font-size:23px; }
 .dense .trade__t    { font-size:20px; flex-basis:84px; }
 .dense .mk          { width:82px; }
@@ -306,11 +306,20 @@ b,strong{ font-weight:600; }
 .dense .buys        { gap:16px; }
 .dense .buys__d     { font-size:22px; }
 .dense .buys__k     { font-size:26px; flex-basis:220px; }
+.dense .waste       { flex-basis:152px; }
+.dense .waste__hd   { flex-basis:152px; }
+.dense .waste__k    { font-size:18px; }
+.dense .effects__t  { font-size:23px; }
+.dense .vars__d     { font-size:20px; }
 
 .stack   { display:flex; flex-direction:column; }
 .gap-xs  { gap:12px; }  .gap-s{ gap:20px; }  .gap-m{ gap:32px; }
 .gap-l   { gap:48px; }  .gap-xl{ gap:64px; }
 .push    { margin-top:auto; }
+/* A stack that takes the leftover height, so the .push inside it can pin the
+   closing rule to the floor of the canvas instead of trailing the content.
+   Beats the blanket `.slide > *{flex-shrink:0}` on specificity. */
+.slide > .fill{ flex:1 1 auto; min-height:0; }
 .mw-sm{ max-width:720px; }  .mw-md{ max-width:900px; }  .mw-lg{ max-width:1040px; }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -346,7 +355,10 @@ b,strong{ font-weight:600; }
   padding-right:16px;
 }
 .data-row__v{ font-size:44px; }
-.data-row__k{ font-size:18px; font-weight:400; letter-spacing:.04em; color:var(--mute); white-space:nowrap; }
+.data-row__k{
+  display:flex; align-items:center; gap:8px;
+  font-size:18px; font-weight:400; letter-spacing:.04em; color:var(--mute); white-space:nowrap;
+}
 
 .spiral{ display:flex; gap:64px; align-items:center; }
 .spiral__svg{ flex:0 0 300px; width:300px; height:300px; }
@@ -418,10 +430,84 @@ b,strong{ font-weight:600; }
 .trade__t{ flex:0 0 96px; text-align:right; font-size:22px; font-weight:600; color:var(--ink); }
 @media (prefers-reduced-motion:reduce){ .mk__fill{ transition:none; } }
 
+/* ── concept marks ──
+   Thin line icons, one idea each. They take their colour from the ground, so
+   they invert with everything else and never need a second version. */
+.ico{ flex:0 0 auto; width:32px; height:32px; color:var(--costa-blue); }
+.ico--lg{ width:44px; height:44px; }
+body.is-dark .ico{ color:var(--accent); }
+
+/* one conversation, three effects */
+.effects{ display:flex; flex-direction:column; gap:22px; }
+.effects__r{
+  display:flex; gap:24px; align-items:center;
+  padding:20px 0 20px 26px; border-left:3px solid var(--frame);
+}
+.effects__r:nth-child(1){ border-left-color:var(--accent); }
+.effects__r:nth-child(2){ border-left-color:var(--costa-blue); }
+.effects__r:nth-child(3){ border-left-color:var(--down); }
+.effects__r .ico{ width:36px; height:36px; }
+.effects__t{ flex:1 1 auto; font-size:26px; font-weight:300; line-height:1.4; color:var(--ink-soft); }
+
+/* the two variables the cycle does not see.
+   The icon sits on the key's baseline rather than above it: a stacked mark
+   costs a whole row of height, and this slide has none to spare. */
+.vars{ display:flex; gap:40px; }
+.vars__c{
+  flex:1 1 0; display:flex; flex-direction:column; gap:12px;
+  padding:28px 30px; border:1px solid var(--frame); border-radius:3px;
+}
+.vars__h{ display:flex; align-items:center; gap:16px; min-height:44px; }
+.vars__h .ico{ width:40px; height:40px; }
+.vars__k{ font-size:32px; font-weight:700; letter-spacing:-.02em; }
+.vars__d{ font-size:22px; font-weight:300; line-height:1.45; color:var(--ink-soft); }
+
+/* flag chips for the power-distance row */
+.flag{
+  display:block; width:30px; height:20px; border-radius:2px;
+  box-shadow:0 0 0 1px var(--frame) inset;
+}
+
+/* time wasted, in place of minutes: three bars, filled by severity */
+/* Wide enough that "TIME WASTED" sets on one line — the label may not shrink
+   below 18px, so the column gives way instead. */
+.waste{ flex:0 0 152px; display:flex; flex-direction:column; align-items:flex-end; gap:7px; }
+.waste__hd{
+  flex:0 0 152px; text-align:right;
+  font-size:18px; font-weight:600; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--mute);
+}
+.waste__bars{ display:flex; gap:4px; align-items:flex-end; height:22px; }
+.waste__bars i{
+  display:block; width:13px; background:var(--frame); border-radius:1px;
+  transform:scaleY(.25); transform-origin:50% 100%;
+  transition:transform 560ms var(--ease-mask), background-color 400ms var(--ease-out);
+}
+.waste__bars i:nth-child(1){ height:10px; }
+.waste__bars i:nth-child(2){ height:16px; }
+.waste__bars i:nth-child(3){ height:22px; }
+.waste__k{ font-size:20px; font-weight:600; letter-spacing:.02em; }
+.shown .waste__bars i{ transform:scaleY(1); }
+.waste--low  .waste__bars i:nth-child(1){ background:var(--signal); }
+.waste--low  .waste__k{ color:var(--signal); }
+.waste--mid  .waste__bars i:nth-child(-n+2){ background:var(--accent); }
+.waste--mid  .waste__k{ color:var(--accent); }
+.waste--high .waste__bars i{ background:var(--down); }
+.waste--high .waste__k{ color:var(--down); }
+.trade__hd{ display:flex; align-items:center; gap:28px; padding-bottom:6px; }
+@media (prefers-reduced-motion:reduce){ .waste__bars i{ transition:none; transform:scaleY(1); } }
+
+/* the closing line, alone on the screen */
+.closing{ font-size:62px; font-weight:700; line-height:1.16; letter-spacing:-.03em; }
+
 /* ── what it buys (new) ── */
 .buys{ display:flex; flex-direction:column; gap:22px; }
 .buys__r{ display:flex; gap:28px; align-items:flex-start; padding-left:24px; border-left:3px solid var(--accent); }
-.buys__k{ flex:0 0 250px; font-size:28px; font-weight:600; letter-spacing:-.01em; }
+.buys__k{
+  flex:0 0 250px; font-size:28px; font-weight:600; letter-spacing:-.01em;
+  display:flex; align-items:center; gap:14px;
+}
+.buys__k .ico{ width:28px; height:28px; }
 .buys__d{ flex:1 1 auto; font-size:24px; font-weight:300; line-height:1.45; color:var(--ink-soft); }
 
 /* ══════════════════════════════════════════════════════════════════════════
@@ -530,6 +616,62 @@ kbd svg{ width:.95em; height:.95em; fill:currentColor; }
 <svg width="0" height="0" style="position:absolute" aria-hidden="true" focusable="false">
   <symbol id="i-right" viewBox="0 0 24 24"><path d="M4 11h12.2l-4.6-4.6L13 5l7 7-7 7-1.4-1.4 4.6-4.6H4z"/></symbol>
   <symbol id="i-left"  viewBox="0 0 24 24"><path d="M20 11H7.8l4.6-4.6L11 5l-7 7 7 7 1.4-1.4L7.8 13H20z"/></symbol>
+
+  <!-- Concept marks. Thin strokes, one idea each, reused wherever that idea
+       recurs. Drawn rather than typed so they inherit the ground's colour
+       through the inversion. -->
+  <symbol id="i-person" viewBox="0 0 32 32" fill="none" stroke="currentColor"
+          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="16" cy="11" r="5"/><path d="M6 28c0-5.5 4.5-10 10-10s10 4.5 10 10"/>
+  </symbol>
+  <symbol id="i-people" viewBox="0 0 32 32" fill="none" stroke="currentColor"
+          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="12" cy="11" r="4.5"/><path d="M3 27c0-5 4-9 9-9s9 4 9 9"/>
+    <circle cx="23" cy="12" r="3.5"/><path d="M22 19.4c4 .5 7 3.8 7 7.6"/>
+  </symbol>
+  <symbol id="i-listen" viewBox="0 0 32 32" fill="none" stroke="currentColor"
+          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M11 13a5 5 0 0 1 10 0c0 3-2.4 4.2-3.4 5.6-.8 1.1-.6 2.4-.6 3.4"/>
+    <path d="M13.5 26h4"/><path d="M25 8a11 11 0 0 1 0 16"/>
+  </symbol>
+  <symbol id="i-speech" viewBox="0 0 32 32" fill="none" stroke="currentColor"
+          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M27 18a3 3 0 0 1-3 3H12l-6 5V8a3 3 0 0 1 3-3h15a3 3 0 0 1 3 3z"/>
+    <path d="M11 11h10M11 15.5h6"/>
+  </symbol>
+  <symbol id="i-repeat" viewBox="0 0 32 32" fill="none" stroke="currentColor"
+          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M6 16a10 10 0 0 1 17-7.1"/><path d="M26 16a10 10 0 0 1-17 7.1"/>
+    <path d="M23 4v5h-5"/><path d="M9 28v-5h5"/>
+  </symbol>
+  <symbol id="i-clock" viewBox="0 0 32 32" fill="none" stroke="currentColor"
+          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="16" cy="16" r="11"/><path d="M16 9.5V16l4.5 3"/>
+  </symbol>
+  <symbol id="i-handover" viewBox="0 0 32 32" fill="none" stroke="currentColor"
+          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <circle cx="8" cy="10" r="4"/><path d="M2 24c0-3.3 2.7-6 6-6"/>
+    <circle cx="24" cy="10" r="4"/><path d="M30 24c0-3.3-2.7-6-6-6"/>
+    <path d="M12.5 22h7"/><path d="M17 19.5l2.5 2.5-2.5 2.5"/>
+  </symbol>
+  <symbol id="i-cascade" viewBox="0 0 32 32" fill="none" stroke="currentColor"
+          stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+    <rect x="12" y="3" width="8" height="6" rx="1"/>
+    <rect x="3" y="23" width="8" height="6" rx="1"/>
+    <rect x="21" y="23" width="8" height="6" rx="1"/>
+    <path d="M16 9v7M7 23v-4h18v4"/>
+  </symbol>
+
+  <!-- Simplified flag chips: bands and one identifying element, no crests.
+       Enough to recognise at 30px, nothing more. -->
+  <symbol id="f-ph" viewBox="0 0 30 20"><rect width="30" height="10" fill="#0038A8"/><rect y="10" width="30" height="10" fill="#CE1126"/><path d="M0 0l13 10L0 20z" fill="#fff"/><circle cx="4.4" cy="10" r="2.1" fill="#FCD116"/></symbol>
+  <symbol id="f-mx" viewBox="0 0 30 20"><rect width="10" height="20" fill="#006847"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#CE1126"/><circle cx="15" cy="10" r="2.6" fill="none" stroke="#8C6239" stroke-width="1.1"/></symbol>
+  <symbol id="f-id" viewBox="0 0 30 20"><rect width="30" height="10" fill="#CE1126"/><rect y="10" width="30" height="10" fill="#fff"/></symbol>
+  <symbol id="f-in" viewBox="0 0 30 20"><rect width="30" height="6.7" fill="#FF9933"/><rect y="6.7" width="30" height="6.6" fill="#fff"/><rect y="13.3" width="30" height="6.7" fill="#138808"/><circle cx="15" cy="10" r="2.4" fill="none" stroke="#000080" stroke-width="1.1"/></symbol>
+  <symbol id="f-br" viewBox="0 0 30 20"><rect width="30" height="20" fill="#009B3A"/><path d="M15 2.6L27.4 10 15 17.4 2.6 10z" fill="#FEDF00"/><circle cx="15" cy="10" r="3.4" fill="#002776"/></symbol>
+  <symbol id="f-co" viewBox="0 0 30 20"><rect width="30" height="10" fill="#FCD116"/><rect y="10" width="30" height="5" fill="#003893"/><rect y="15" width="30" height="5" fill="#CE1126"/></symbol>
+  <symbol id="f-pe" viewBox="0 0 30 20"><rect width="10" height="20" fill="#D91023"/><rect x="10" width="10" height="20" fill="#fff"/><rect x="20" width="10" height="20" fill="#D91023"/></symbol>
+  <symbol id="f-it" viewBox="0 0 30 20"><rect width="10" height="20" fill="#008C45"/><rect x="10" width="10" height="20" fill="#F4F5F0"/><rect x="20" width="10" height="20" fill="#CD212A"/></symbol>
 </svg>
 
 <div class="viewport">
@@ -621,7 +763,7 @@ const RAIL = ['Respect & Protect', 'Listen & Learn', 'Speak Up', 'Better Togethe
 
 const SLIDES = [
 
-/* ── 01 ─────────────────────────────────────────────────────────────────── */
+/* ── 01 ──────────────────────────────────────────────────────────── */
 { n:'01', rail:0, steps:4, center:true, html:`
   <div class="stack gap-l">
     <div class="stack gap-m">
@@ -631,32 +773,21 @@ const SLIDES = [
     </div>
     <div class="stack gap-s mw-lg" data-step="4">
       <div class="rule"></div>
-      <p class="lead accent">Three sentences. Three different people. Not one bad manager among them.</p>
+      <p class="lead accent">Three sentences. Three examples of negative feedback. What are the outcomes?</p>
     </div>
   </div>`,
   notes:`Reveal one at a time. Two seconds of silence after the third. Then: <em>Nobody in this room would call that abuse. Nobody would report it. It takes two seconds and it costs nothing to say. By the end of this session I want to show you what it actually costs.</em>` },
 
-/* ── 02 ─────────────────────────────────────────────────────────────────── */
+/* ── 02 ──────────────────────────────────────────────────────────── */
 { n:'02', rail:0, steps:2, center:true, html:`
   <div class="stack gap-m mw-lg">
     <p class="display" data-split="words" data-step="1">This is not a session about being nice.</p>
-    <p class="display" data-split="words" data-step="2">It is about the quality of the information you make decisions on.</p>
+    <p class="display" data-split="words" data-step="2">It is about the quality of the feedback we provide, and the cascading effects are bigger than we can imagine.</p>
   </div>`,
   notes:`Flat, no smile. This buys you the room before they finish deciding it is thirty minutes of soft skills.` },
 
-/* ── 03 ─────────────────────────────────────────────────────────────────── */
-{ n:'03', rail:0, steps:2, center:true, html:`
-  <div class="stack gap-l">
-    <p class="eyebrow" data-step="0">Before I built this session</p>
-    <div class="stack gap-m mw-lg">
-      <p class="headline" data-step="1">I asked our HR one question: what is the most urgent topic on board right now?</p>
-      <p class="display accent" data-step="2">This was the answer.</p>
-    </div>
-  </div>`,
-  notes:`A method, not an anecdote. It is not my opinion of what we need. It is ours.` },
-
-/* ── 04 ─────────────────────────────────────────────────────────────────── */
-{ n:'04', rail:0, steps:5, html:`
+/* ── 03 ──────────────────────────────────────────────────────────── */
+{ n:'03', rail:0, steps:5, html:`
   <p class="eyebrow" data-step="0">What we know about feedback</p>
   <div class="stack gap-l" style="margin-top:44px">
     <div class="stats-row">
@@ -677,13 +808,13 @@ const SLIDES = [
     </div>
     <div class="stack gap-s" data-step="5">
       <div class="rule"></div>
-      <p class="display">They want it. A third of the time, we make it worse.</p>
+      <p class="display">Feedback is welcomed. A third of the time, we make it worse.</p>
     </div>
   </div>`,
   notes:`The anchor of the session. Feedback is not automatically good. On average it works, and in more than one case in three it backfires. Say <em>d = 0.41</em> out loud; it shows you read the paper and not the headline.` },
 
-/* ── 05 ─────────────────────────────────────────────────────────────────── */
-{ n:'05', rail:0, steps:3, html:`
+/* ── 04 ──────────────────────────────────────────────────────────── */
+{ n:'04', rail:0, steps:3, html:`
   <p class="eyebrow" data-step="0">Our continuous improvement cycle</p>
   <div class="stack gap-l" style="margin-top:44px">
     <div class="cycle">
@@ -696,21 +827,21 @@ const SLIDES = [
     <p class="display mw-lg" data-step="2">The cycle only closes if somebody says that something did not work.</p>
     <div class="stack gap-s mw-lg" data-step="3">
       <div class="rule"></div>
-      <p class="lead accent">That sentence is the joint. It is the only part of the cycle that depends entirely on how a human being behaves under pressure.</p>
+      <p class="lead accent">High quality feedback is the essential joint of our improvement cycle. And it depends entirely on how a human being behaves under pressure.</p>
     </div>
   </div>`,
   notes:`Take the wheel exactly as it is on the wall. Do not critique it. Use it.` },
 
-/* ── 06 ─────────────────────────────────────────────────────────────────── */
-{ n:'06', rail:0, steps:1, center:true, html:`
+/* ── 05 ──────────────────────────────────────────────────────────── */
+{ n:'05', rail:0, steps:1, center:true, html:`
   <div class="stack gap-m">
     <h1 class="title" data-step="0">The Broken Loop<span class="dot"></span></h1>
     <p class="lead" data-step="1" style="color:var(--mute)">Where the cycle breaks, and which value stops working when it does.</p>
   </div>`,
   notes:`Slow down. This is the name they repeat afterwards.` },
 
-/* ── 07 ─────────────────────────────────────────────────────────────────── */
-{ n:'07', cls:'tight', rail:1, steps:4, html:`
+/* ── 06 ──────────────────────────────────────────────────────────── */
+{ n:'06', cls:'tight', rail:1, steps:4, html:`
   <p class="eyebrow" data-step="0">Break point 01 · Respect &amp; Protect</p>
   <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">The moment.</h2>
   <div class="stack gap-m" style="margin-top:22px">
@@ -737,8 +868,8 @@ const SLIDES = [
   </div>`,
   notes:`Land hard on <em>25%</em>. That is our product.` },
 
-/* ── 08 ─────────────────────────────────────────────────────────────────── */
-{ n:'08', cls:'tight', rail:2, steps:3, html:`
+/* ── 07 ──────────────────────────────────────────────────────────── */
+{ n:'07', cls:'tight', rail:2, steps:3, html:`
   <p class="eyebrow" data-step="0">Break point 02 · Listen &amp; Learn</p>
   <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">The verdict before the question.</h2>
   <div class="split" style="margin-top:52px">
@@ -757,23 +888,18 @@ const SLIDES = [
   </div>`,
   notes:`No statistic. The mechanism is enough. Keep this the shortest slide in the deck.` },
 
-/* ── 09 ─────────────────────────────────────────────────────────────────── */
-{ n:'09', cls:'tight', rail:3, steps:4, html:`
+/* ── 08 ──────────────────────────────────────────────────────────── */
+{ n:'08', cls:'tight', rail:3, steps:2, html:`
   <p class="eyebrow" data-step="0">Break point 03 · Speak Up</p>
   <h2 class="headline mw-lg" data-step="0" style="--i:1;margin-top:12px">They do not stop making mistakes. They stop reporting them.</h2>
   <div class="stack gap-m" style="margin-top:24px">
     <p class="body mw-lg" data-step="1">A study of hospital nursing units found that units with better leadership and team climate reported <b>more</b> errors, not fewer. Not because they made more. Because their people felt safe enough to say so.</p>
     <p class="src" data-step="2">Edmondson · Journal of Applied Behavioral Science, 1996</p>
-    <div class="stack gap-s mw-lg" data-step="3">
-      <div class="rule"></div>
-      <p class="lead accent">And on ships: seafarers who had worked with their manager for less than one year reported significantly fewer near-misses.</p>
-    </div>
-    <p class="body mw-lg" data-step="4">Your data starts telling you what people think you can hear.</p>
   </div>`,
-  notes:`State Edmondson precisely: better climate raises <em>detection</em>, it does not lower the error rate. The seafarer finding is what makes it ours. On a ship with rotating contracts, most crew are inside that first year most of the time.` },
+  notes:`State Edmondson precisely: better climate raises <em>detection</em>, it does not lower the error rate. Then stop — the room finishes the thought about their own reports without being told.` },
 
-/* ── 10 ─────────────────────────────────────────────────────────────────── */
-{ n:'10', cls:'tight', rail:4, steps:4, html:`
+/* ── 09 ──────────────────────────────────────────────────────────── */
+{ n:'09', cls:'tight', rail:4, steps:4, html:`
   <p class="eyebrow" data-step="0">Break point 04 · Better Together</p>
   <h2 class="headline mw-lg" data-step="0" style="--i:1;margin-top:12px">The people watching learn more than the person receiving.</h2>
   <div class="stack gap-m" style="margin-top:34px">
@@ -790,8 +916,8 @@ const SLIDES = [
   </div>`,
   notes:`The one nobody expects. Not the recipient: <em>the room</em>.` },
 
-/* ── 11 ─────────────────────────────────────────────────────────────────── */
-{ n:'11', cls:'tight', rail:5, steps:3, html:`
+/* ── 10 ──────────────────────────────────────────────────────────── */
+{ n:'10', cls:'tight', rail:5, steps:3, html:`
   <p class="eyebrow" data-step="0">Break point 05 · Always Improving</p>
   <h2 class="headline mw-lg" data-step="0" style="--i:1;margin-top:12px">Adjust runs on whatever survived the first four.</h2>
   <div class="stack gap-m" style="margin-top:34px">
@@ -804,7 +930,36 @@ const SLIDES = [
   </div>`,
   notes:`Close the argument without a statistic. By now they are making the conclusion themselves.` },
 
-/* ── 12 ─────────────────────────────────────────────────────────────────── */
+/* ── 11 ──────────────────────────────────────────────────────────── */
+{ n:'11', rail:0, cls:'dense', steps:3, html:`
+  <p class="eyebrow" data-step="0">Two variables the cycle does not see</p>
+  <h2 class="headline mw-lg" data-step="0" style="--i:1;margin-top:12px">The same feedback is not the same feedback.</h2>
+  <div class="stack gap-m fill" style="margin-top:30px">
+    <p class="body mw-lg" data-step="1">The five break points tell you how a conversation goes wrong. They assume every conversation starts from the same place. Two things decide that it does not.</p>
+    <div class="vars">
+      <div class="vars__c lift" data-step="2" style="--i:0">
+        <span class="vars__h">
+          <svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-people"/></svg>
+          <span class="vars__k">Who</span>
+        </span>
+        <span class="vars__d">Who is in front of you, and what they were taught a manager is allowed to say.</span>
+      </div>
+      <div class="vars__c lift" data-step="2" style="--i:1">
+        <span class="vars__h">
+          <svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-clock"/></svg>
+          <span class="vars__k">When</span>
+        </span>
+        <span class="vars__d">Where they are in a contract, and how much they have left to absorb it with.</span>
+      </div>
+    </div>
+    <div class="stack gap-s push" data-step="3">
+      <div class="rule"></div>
+      <p class="lead accent">Neither changes what you say. Both change what arrives.</p>
+    </div>
+  </div>`,
+  notes:`Twenty seconds — this is a frame, the next two slides are the evidence. The line to land: <em>you can deliver the identical sentence twice and have it arrive as coaching once and as a threat the other time.</em>` },
+
+/* ── 12 ──────────────────────────────────────────────────────────── */
 { n:'12', rail:0, steps:4, cls:'dense', html:`
   <p class="eyebrow" data-step="0">Who is in the room</p>
   <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">The same sentence is not the same sentence.</h2>
@@ -812,14 +967,14 @@ const SLIDES = [
     <div class="stack gap-s">
       <p class="eyebrow" data-step="1">Power Distance Index — the expectation that hierarchy is fixed and unquestioned</p>
       <div class="data-row">
-        <div class="data-row__c lift" data-step="1" style="--i:0"><span class="data-row__v fig" data-count="94">0</span><span class="data-row__k">Philippines</span></div>
-        <div class="data-row__c lift" data-step="1" style="--i:1"><span class="data-row__v fig" data-count="81">0</span><span class="data-row__k">Mexico</span></div>
-        <div class="data-row__c lift" data-step="1" style="--i:2"><span class="data-row__v fig" data-count="78">0</span><span class="data-row__k">Indonesia</span></div>
-        <div class="data-row__c lift" data-step="1" style="--i:3"><span class="data-row__v fig" data-count="77">0</span><span class="data-row__k">India</span></div>
-        <div class="data-row__c lift" data-step="1" style="--i:4"><span class="data-row__v fig" data-count="69">0</span><span class="data-row__k">Brazil</span></div>
-        <div class="data-row__c lift" data-step="1" style="--i:5"><span class="data-row__v fig" data-count="67">0</span><span class="data-row__k">Colombia</span></div>
-        <div class="data-row__c lift" data-step="1" style="--i:6"><span class="data-row__v fig" data-count="64">0</span><span class="data-row__k">Peru</span></div>
-        <div class="data-row__c lift" data-step="1" style="--i:7"><span class="data-row__v fig" data-count="50">0</span><span class="data-row__k">Italy</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:0"><span class="data-row__v fig" data-count="94">0</span><span class="data-row__k"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><use href="#f-ph"/></svg>Philippines</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:1"><span class="data-row__v fig" data-count="81">0</span><span class="data-row__k"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><use href="#f-mx"/></svg>Mexico</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:2"><span class="data-row__v fig" data-count="78">0</span><span class="data-row__k"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><use href="#f-id"/></svg>Indonesia</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:3"><span class="data-row__v fig" data-count="77">0</span><span class="data-row__k"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><use href="#f-in"/></svg>India</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:4"><span class="data-row__v fig" data-count="69">0</span><span class="data-row__k"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><use href="#f-br"/></svg>Brazil</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:5"><span class="data-row__v fig" data-count="67">0</span><span class="data-row__k"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><use href="#f-co"/></svg>Colombia</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:6"><span class="data-row__v fig" data-count="64">0</span><span class="data-row__k"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><use href="#f-pe"/></svg>Peru</span></div>
+        <div class="data-row__c lift" data-step="1" style="--i:7"><span class="data-row__v fig" data-count="50">0</span><span class="data-row__k"><svg class="flag" viewBox="0 0 30 20" aria-hidden="true"><use href="#f-it"/></svg>Italy</span></div>
       </div>
     </div>
     <p class="src" data-step="2">Hofstede · national averages from employee survey data · a description of populations, not of the person in front of you</p>
@@ -831,7 +986,7 @@ const SLIDES = [
   </div>`,
   notes:`The most delicate slide in the deck. Do not characterise nationalities. Say it as: <em>the gap between the top and the bottom of this list is wider than the gap between any two departments on this ship, and it sits inside every team you run.</em> Then go straight to the operational point. The takeaway is not <em>adapt your message to their passport</em>. It is <em>stop assuming your message was received the way you sent it</em>.` },
 
-/* ── 13 ─────────────────────────────────────────────────────────────────── */
+/* ── 13 ──────────────────────────────────────────────────────────── */
 { n:'13', rail:0, cls:'dense', steps:3, html:`
   <p class="eyebrow" data-step="0">When you deliver it</p>
   <h2 class="headline mw-lg" data-step="0" style="--i:1;margin-top:12px">The same feedback lands differently in month one and month seven.</h2>
@@ -845,7 +1000,7 @@ const SLIDES = [
   </div>`,
   notes:`Short. It buys you the right to talk about timing without sounding like you are excusing anyone.` },
 
-/* ── 14 ─────────────────────────────────────────────────────────────────── */
+/* ── 14 ──────────────────────────────────────────────────────────── */
 { n:'14', rail:0, cls:'dense', steps:7, html:`
   <p class="eyebrow" data-step="0">Before you open your mouth</p>
   <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">The set-up-to-fail syndrome.</h2>
@@ -878,7 +1033,7 @@ const SLIDES = [
   </div>`,
   notes:`The uncomfortable slide, and the one that separates you from someone reading a model off a slide. Do not soften it. Pause before advancing, because the next slide is the way out.` },
 
-/* ── 15 ─────────────────────────────────────────────────────────────────── */
+/* ── 15 ──────────────────────────────────────────────────────────── */
 { n:'15', rail:0, steps:5, cls:'dense', html:`
   <p class="eyebrow" data-step="0">The way out</p>
   <div class="stack gap-l" style="margin-top:24px">
@@ -907,7 +1062,7 @@ const SLIDES = [
   </div>`,
   notes:`Hold on the zero. Not a low number: <em>zero</em>. Nobody in the control group revised anything. Then give the caveat plainly, because it earns you more than it costs: this was tested on students, not on crew, and a 2024 replication in a university setting did not reproduce the trust effect. What transfers is the principle, not a magic sentence.` },
 
-/* ── 16 ─────────────────────────────────────────────────────────────────── */
+/* ── 16 ──────────────────────────────────────────────────────────── */
 { n:'16', rail:0, cls:'dense', steps:5, html:`
   <p class="eyebrow" data-step="0">Three moves</p>
   <div class="cols3" style="margin-top:44px">
@@ -933,18 +1088,33 @@ const SLIDES = [
   </div>`,
   notes:`Twenty seconds each. <em>Agree</em> is the one everybody skips, and it is the one with the strongest evidence behind it.` },
 
-/* ── 17 ─────────────────────────────────────────────────────────────────── */
-{ n:'17', rail:0, steps:1, center:true, html:`
-  <div class="stack gap-l">
-    <div class="stack gap-s">
-      <p class="eyebrow" data-step="0">One thing to drop</p>
-      <h2 class="title" data-step="0" style="--i:1">The sandwich.</h2>
+/* ── 17 ──────────────────────────────────────────────────────────── */
+{ n:'17', rail:0, cls:'dense', steps:4, html:`
+  <p class="eyebrow" data-step="0">One conversation, three separate effects</p>
+  <h2 class="headline mw-lg" data-step="0" style="--i:1;margin-top:12px">The same thirty seconds does three different things.</h2>
+  <div class="stack gap-m fill" style="margin-top:30px">
+    <div class="effects">
+      <div class="effects__r lift" data-step="1">
+        <svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-person"/></svg>
+        <span class="effects__t">It lands on a person, who remembers how it felt long after what it was about.</span>
+      </div>
+      <div class="effects__r lift" data-step="2">
+        <svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-listen"/></svg>
+        <span class="effects__t">It decides what they bring you next time, or whether they bring you anything.</span>
+      </div>
+      <div class="effects__r lift" data-step="3">
+        <svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-repeat"/></svg>
+        <span class="effects__t">It changes the behaviour, or it does not, and you find out weeks later.</span>
+      </div>
     </div>
-    <p class="display mw-lg" data-step="1">Once the pattern is predictable, you have not softened the criticism. You have taught your team that praise is a warning.</p>
+    <div class="stack gap-s push" data-step="4">
+      <div class="rule"></div>
+      <p class="lead accent">These three move independently. One score cannot tell you what a conversation cost.</p>
+    </div>
   </div>`,
-  notes:`One line, then move. Do not defend it.` },
+  notes:`The hinge into the dashboard. A single sentence is not one outcome, it is three, and they pull against each other. <em>Which is why we are about to watch three needles and not one.</em>` },
 
-/* ── 18 ─────────────────────────────────────────────────────────────────── */
+/* ── 18 ──────────────────────────────────────────────────────────── */
 /* ── 18 · NEW — what the dashboard measures ───────────────────────────────── */
 { n:'18', rail:0, steps:2, html:`
   <p class="eyebrow" data-step="0">What the dashboard measures</p>
@@ -995,12 +1165,17 @@ const SLIDES = [
   </div>`,
   notes:`Twenty seconds. They are about to move these three by hand, so name them now. The point to land: <em>these are not scores. They are three different things a single sentence does at the same time.</em>` },
 
-/* ── 19 · NEW — the trade ─────────────────────────────────────────────────── */
+/* ── 19 ──────────────────────────────────────────────────────────── */
 { n:'19', rail:0, cls:'dense', steps:3, html:`
   <p class="eyebrow" data-step="0">The trade</p>
   <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">No move takes all three up for free.</h2>
-  <div class="stack gap-m" style="margin-top:34px">
+  <div class="stack gap-m fill" style="margin-top:22px">
     <div class="trade">
+      <div class="trade__hd">
+        <span class="trade__n"></span>
+        <span class="trade__marks"></span>
+        <span class="waste__hd">Time wasted</span>
+      </div>
       <div class="trade__r lift" data-step="1" style="--i:0">
         <span class="trade__n">Correct it on the spot, in front of the section</span>
         <span class="trade__marks">
@@ -1008,7 +1183,7 @@ const SLIDES = [
           <span class="mk mk--down"><span class="mk__k">Signal</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
           <span class="mk mk--up"><span class="mk__k">Standard</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
         </span>
-        <span class="trade__t">1 min</span>
+        <span class="waste waste--mid"><span class="waste__bars"><i></i><i></i><i></i></span><span class="waste__k">Medium</span></span>
       </div>
       <div class="trade__r lift" data-step="1" style="--i:1">
         <span class="trade__n">Say nothing, and quietly fix it yourself</span>
@@ -1017,7 +1192,7 @@ const SLIDES = [
           <span class="mk mk--flat"><span class="mk__k">Signal</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
           <span class="mk mk--down"><span class="mk__k">Standard</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
         </span>
-        <span class="trade__t">0 min</span>
+        <span class="waste waste--high"><span class="waste__bars"><i></i><i></i><i></i></span><span class="waste__k">High</span></span>
       </div>
       <div class="trade__r lift" data-step="1" style="--i:2">
         <span class="trade__n">Ask first, then agree one change and a date</span>
@@ -1026,17 +1201,18 @@ const SLIDES = [
           <span class="mk mk--up"><span class="mk__k">Signal</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
           <span class="mk mk--up"><span class="mk__k">Standard</span><span class="mk__bar"><span class="mk__fill"></span></span></span>
         </span>
-        <span class="trade__t">6 min</span>
+        <span class="waste waste--low"><span class="waste__bars"><i></i><i></i><i></i></span><span class="waste__k">Low</span></span>
       </div>
     </div>
-    <p class="body mw-lg" data-step="2">Only the third one moves all three. It is also the only one that costs you anything.</p>
+    <p class="body mw-lg" data-step="2">The third one is the only one that moves all three. It is also the only one you do once.</p>
     <div class="stack gap-s push" data-step="3">
       <div class="rule"></div>
-      <p class="lead accent">That is the whole trade. You are about to make it eight times.</p>
+      <p class="lead accent">Time wasted is not how long the conversation takes. It is how many times you have to have it.</p>
     </div>
   </div>`,
-  notes:`Do not explain the dashboard mechanics beyond this. They will learn the rest by using it. The sentence that matters: <em>the fast option and the good option are different options.</em>` },
+  notes:`The column is <em>time wasted</em>, not minutes spent, and that reversal is the point. Correcting publicly is quick and you repeat it. Fixing it yourself costs nothing today and costs you forever. Asking takes longest once and closes it. <em>You are about to make this trade eight times.</em>` },
 
+/* ── 20 ──────────────────────────────────────────────────────────── */
 /* Step 2 is the handoff itself: nothing is revealed, the console takes over. */
 { n:'20', rail:0, steps:2, center:true, handoffAt:2, html:`
   <div class="stack gap-l">
@@ -1049,7 +1225,7 @@ const SLIDES = [
   </div>`,
   notes:`Advance once more and the console takes over — the screen is already its colour. Read each case, take the room’s answer out loud, register it, move on. Open discussion only where the room splits. <em>Esc brings you back here.</em>` },
 
-/* ── 19 ─────────────────────────────────────────────────────────────────── */
+/* ── 21 ──────────────────────────────────────────────────────────── */
 { n:'21', rail:0, steps:3, arriveDark:true, html:`
   <p class="eyebrow" data-step="0">What just happened</p>
   <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">Same facts. Different verdicts.</h2>
@@ -1063,22 +1239,22 @@ const SLIDES = [
   </div>`,
   notes:`Point at the cases where the room split. The disagreement is the evidence, not a problem.` },
 
-/* ── 22 · NEW — what the three instruments buy ────────────────────────────── */
+/* ── 22 ──────────────────────────────────────────────────────────── */
 { n:'22', rail:0, cls:'dense', steps:2, html:`
   <p class="eyebrow" data-step="0">What the three instruments buy</p>
   <h2 class="headline mw-lg" data-step="0" style="--i:1;margin-top:12px">Delegation, cascading, and the time you get back.</h2>
   <div class="stack gap-m" style="margin-top:30px">
     <div class="buys">
       <div class="buys__r lift" data-step="1" style="--i:0">
-        <span class="buys__k">Delegation</span>
+        <span class="buys__k"><svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-handover"/></svg>Delegation</span>
         <span class="buys__d">You can only hand work to someone whose standard you trust. Trust and Standard together decide how much of your job you are able to stop doing yourself.</span>
       </div>
       <div class="buys__r lift" data-step="1" style="--i:1">
-        <span class="buys__k">Cascading</span>
+        <span class="buys__k"><svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-cascade"/></svg>Cascading</span>
         <span class="buys__d">A message survives one level down only if the people carrying it will tell you when it is not landing. That is Signal, and it is the first of the three to go.</span>
       </div>
       <div class="buys__r lift" data-step="1" style="--i:2">
-        <span class="buys__k">Time</span>
+        <span class="buys__k"><svg class="ico" viewBox="0 0 32 32" aria-hidden="true"><use href="#i-clock"/></svg>Time</span>
         <span class="buys__d">The minutes you spent asking are cheaper than the third occurrence, the audit that follows it, and the conversation you end up having anyway.</span>
       </div>
     </div>
@@ -1089,48 +1265,10 @@ const SLIDES = [
   </div>`,
   notes:`This is where the minutes they just spent turn into an argument rather than a complaint. Ask: <em>which of your managers could you hand more to tomorrow, and what would have to be true first?</em>` },
 
-/* ── 20 ─────────────────────────────────────────────────────────────────── */
+/* ── 23 ──────────────────────────────────────────────────────────── */
 { n:'23', rail:0, steps:1, center:true, html:`
-  <div class="stack gap-m mw-lg">
-    <h2 class="headline" data-step="0">You will give feedback on this session.</h2>
-    <p class="display" data-step="1">Same rules. Stop, ask, agree.</p>
-  </div>`,
-  notes:`Once, lightly, do not linger.` },
-
-/* ── 21 ─────────────────────────────────────────────────────────────────── */
-{ n:'24', rail:0, steps:3, center:true, html:`
-  <div class="stack gap-l">
-    <div class="stack gap-xs">
-      <p class="said said--muted" data-step="1" style="--i:0">“Do you even know what you’re doing?”</p>
-      <p class="said said--muted" data-step="1" style="--i:1">“How many times do I have to tell you this?”</p>
-      <p class="said said--muted" data-step="1" style="--i:2">“Never mind. I’ll do it myself.”</p>
-    </div>
-    <div class="stack gap-s mw-lg" data-step="2">
-      <div class="rule"></div>
-      <p class="display accent">None of them was a bad manager. All of them were in a hurry.</p>
-    </div>
-    <p class="lead mw-lg" data-step="3">The hurry is not going away. The two seconds before the sentence are the only thing we control.</p>
-  </div>`,
-  notes:`Let the room recognise them. This is where the session closes on itself.` },
-
-/* ── 22 ─────────────────────────────────────────────────────────────────── */
-{ n:'25', rail:0, steps:3, center:true, html:`
-  <div class="stack gap-l">
-    <div class="stack gap-s" data-until="2">
-      <p class="eyebrow" data-step="0">Monday morning</p>
-      <h2 class="headline" data-step="0" style="--i:1">Before the verdict, one question.</h2>
-    </div>
-    <div class="stack gap-m mw-lg" data-until="2">
-      <p class="display" data-step="1">Once. This week. With the person you were most sure about.</p>
-      <p class="body" data-step="2">The eight cases stay open. Run them with your own managers, in your own department, in ten minutes.</p>
-    </div>
-  </div>
-  <div style="position:absolute;left:72px;right:72px;top:50%;transform:translateY(-50%)">
-    <p class="accent mw-lg" data-step="3"
-       style="font-size:56px;font-weight:700;line-height:1.15;letter-spacing:-.025em">Continuous improvement is not a wheel. It is a conversation somebody has to be willing to have.</p>
-  </div>`,
-  notes:`Smallest possible commitment. Big ones do not survive the first turnaround. Let the last line sit before you stop sharing.` }
-
+  <p class="closing accent mw-lg" data-split="words" data-step="1">Continuous improvement is not a wheel. It is a conversation somebody has to be willing to have.</p>`,
+  notes:`Nothing else on the screen and nothing else to say. Let it sit, then stop sharing.` },
 ];
 
 
@@ -1163,6 +1301,7 @@ let dark = false, notesOn = false, helpOn = false;
 let startedAt = null;
 let consoleReady = false;
 let consoleMode = null;    /* null | 'frame' | 'tab' */
+let consoleFocusTimer = null;
 
 /* ── 1. the design canvas ────────────────────────────────────────────────── */
 function fit(){
@@ -1408,7 +1547,15 @@ function handoff(){
   if (consoleReady){
     consoleMode = 'frame';
     frame.classList.add('on');
-    setTimeout(() => { try { frame.contentWindow.focus(); } catch (err) {} }, 80);
+    /* Deferred so the frame is on screen before it takes the keyboard. If Esc
+       lands inside that window the return cancels this, otherwise it fires
+       into a hidden frame and every later key press goes there instead of to
+       the deck — which looks, from the lectern, like the deck has frozen. */
+    consoleFocusTimer = setTimeout(() => {
+      consoleFocusTimer = null;
+      if (consoleMode !== 'frame') return;
+      try { frame.contentWindow.focus(); } catch (err) {}
+    }, 80);
   } else {
     /* The frame never announced itself, so it is not usable. Open the
        dashboard in a tab rather than leaving a dead frame on screen. In the
@@ -1428,6 +1575,7 @@ function handoff(){
 }
 
 function returnFromConsole(){
+  if (consoleFocusTimer){ clearTimeout(consoleFocusTimer); consoleFocusTimer = null; }
   $('console').classList.remove('on');
   consoleMode = null;
   /* The slide that opens on the dark ground is the colour already on screen,

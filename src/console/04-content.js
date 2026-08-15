@@ -30,14 +30,14 @@ const CASES = [
   {
     n:'01', title:'Galley: repeated sanitization gaps',
     dept:'Food & Beverage', role:'F&B Manager',
-    setup:'Third spot check this month. Same section, same gaps: waste not segregated, sanitizer log not filled in. The section is run by a Sous Chef who reports to the Executive Chef, your peer under the same Director. Two crew are working two metres away.',
+    setup:'Third spot check this month. Same section, same gaps: waste not segregated, sanitizer log not filled in. The section is run by a crew member who reports to the Executive Chef. Two crew are working two metres away.',
     question:'What do you do first',
     options:[
       { id:'A', label:'Correct on the spot', audience:true,
-        text:'Correct the Sous Chef on the spot, in the section, so the crew see the standard is not negotiable.',
+        text:'Correct him on the spot, in the section, so the crew see the standard is not negotiable.',
         d:{trust:-2, signal:-2, standard:1}, min:1,
         breaks:['respect','speakup'],
-        conseq:'The gap closes today and the standard is visibly enforced. But you corrected another director’s report in front of his own crew, and you have taught two people that being seen is more dangerous than being wrong. The next gap gets tidied before your round, not fixed.' },
+        conseq:'The gap closes today and the standard is visibly enforced. But you corrected another manager’s crew member in front of his own colleagues, and you have taught two people that being seen is more dangerous than being wrong. The next gap gets tidied before your round, not fixed.' },
       { id:'B', label:'Cover it, mention it later', absorb:true,
         text:'Say nothing in the section. Fill the log yourself and mention it to the Executive Chef if it happens again.',
         d:{trust:0, signal:0, standard:-3}, min:0,
