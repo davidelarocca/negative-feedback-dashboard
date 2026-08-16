@@ -215,7 +215,7 @@ console.log('\nDECK');
   }));
   check('Poppins is the only typeface', meta.fonts.length === 1 && meta.fonts[0] === 'Poppins', meta.fonts.join(','));
   check('Poppins actually loaded, so line breaks are the designed ones', meta.loaded);
-  check('23 slides', meta.total === '23', meta.total);
+  check('25 slides', meta.total === '25', meta.total);
   check('canvas scales exactly 1.5x at 1920', meta.transform.includes('scale(1.5)'), meta.transform);
   check('presenter strip carries no key hints', !/notes|full screen/i.test(meta.strip), meta.strip);
   check('mask reveals are wired', meta.masked > 80, String(meta.masked));
@@ -267,7 +267,7 @@ console.log('\nDECK · every slide fits 1280x720');
 
   const rails = {};
   let worstType = Infinity;
-  for (let n = 0; n < 23; n++) {
+  for (let n = 0; n < 25; n++) {
     const id = await probe();
     if (id.console) { await press(p, 'Escape', 350); continue; }
     for (let g = 0; g < 14; g++) {                       // reveal the whole slide
@@ -342,7 +342,7 @@ console.log('\nHANDOFF');
 console.log('\nONE FILE');
 {
   const p = await open(SESSION, { width: 1920, height: 1080 });
-  check('one file, 23 slides', await p.evaluate(() => document.getElementById('p-total').textContent) === '23');
+  check('one file, 25 slides', await p.evaluate(() => document.getElementById('p-total').textContent) === '25');
 
   for (let g = 0; g < 220; g++) {
     if (await p.evaluate(() => document.getElementById('console').classList.contains('on'))) break;

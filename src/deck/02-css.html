@@ -237,6 +237,39 @@ body.is-dark .ico{ color:var(--accent); }
 .trade__hd{ display:flex; align-items:center; gap:28px; padding-bottom:6px; }
 @media (prefers-reduced-motion:reduce){ .waste__bars i{ transition:none; transform:scaleY(1); } }
 
+/* the sandwich, drawn as the three layers the room already recognises.
+   The outer two are muted and the middle one carries the ground, because
+   that inversion is the whole argument: the praise stops registering and
+   only the filling is heard. */
+.sand{ display:flex; flex-direction:column; gap:10px; }
+.sand__l{
+  display:flex; align-items:center; gap:22px;
+  padding:15px 26px; border-radius:3px; font-size:25px; font-weight:600;
+}
+.sand__l--bread{ background:var(--frame); color:var(--mute); }
+.sand__l--fill { background:var(--ink); color:var(--paper); }
+.sand__t{ flex:1 1 auto; }
+.sand__h{
+  flex:0 0 auto; font-size:20px; font-weight:400; font-style:italic;
+  letter-spacing:.01em; opacity:.85;
+}
+
+/* the recap — the session's five takeaways, numbered */
+.recap{ display:flex; flex-direction:column; gap:15px; }
+.recap__r{
+  display:flex; gap:24px; align-items:baseline;
+  padding-bottom:15px; border-bottom:1px solid var(--frame);
+}
+.recap__r:last-child{ padding-bottom:0; border-bottom:0; }
+.recap__n{
+  flex:0 0 34px; font-size:21px; font-weight:700; letter-spacing:.02em;
+  color:var(--accent); font-variant-numeric:tabular-nums;
+}
+/* Both columns set on one line or five rows do not fit the canvas: the key
+   column is sized to the longest key, the description takes the rest. */
+.recap__k{ flex:0 0 460px; font-size:24px; font-weight:600; letter-spacing:-.01em; }
+.recap__d{ flex:1 1 auto; font-size:20px; font-weight:300; line-height:1.4; color:var(--ink-soft); }
+
 /* the closing line, alone on the screen */
 .closing{ font-size:62px; font-weight:700; line-height:1.16; letter-spacing:-.03em; }
 

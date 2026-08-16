@@ -338,7 +338,33 @@ const SLIDES = [
   notes:`Twenty seconds each. <em>Agree</em> is the one everybody skips, and it is the one with the strongest evidence behind it.` },
 
 /* ── 17 ──────────────────────────────────────────────────────────── */
-{ n:'17', rail:0, cls:'dense', steps:4, html:`
+{ n:'17', rail:0, cls:'dense', steps:2, html:`
+  <p class="eyebrow" data-step="0">One thing to drop</p>
+  <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">The sandwich.</h2>
+  <div class="stack gap-m fill" style="margin-top:30px">
+    <div class="sand mw-lg">
+      <div class="sand__l sand__l--bread lift" data-step="1" style="--i:0">
+        <span class="sand__t">Something positive</span>
+        <span class="sand__h">they stop hearing this</span>
+      </div>
+      <div class="sand__l sand__l--fill lift" data-step="1" style="--i:1">
+        <span class="sand__t">The actual message</span>
+        <span class="sand__h">and wait for this</span>
+      </div>
+      <div class="sand__l sand__l--bread lift" data-step="1" style="--i:2">
+        <span class="sand__t">Something positive</span>
+        <span class="sand__h">and discount this</span>
+      </div>
+    </div>
+    <div class="stack gap-s push" data-step="2">
+      <div class="rule"></div>
+      <p class="display accent mw-lg">Once the pattern is predictable, you have not softened the criticism. You have taught your team that praise is a warning.</p>
+    </div>
+  </div>`,
+  notes:`Say it in one line and move. Do not defend it and do not take a show of hands — half the room uses it. Out loud, over the three layers: <em>the structure is not the problem, the predictability is — by the third time, the opening compliment is the cue.</em> The point is not that the shape is wrong, it is that <em>a shape they can see coming stops carrying information</em>. If they want a replacement, it is the previous slide: stop, ask, agree.` },
+
+/* ── 18 ──────────────────────────────────────────────────────────── */
+{ n:'18', rail:0, cls:'dense', steps:4, html:`
   <p class="eyebrow" data-step="0">One conversation, three separate effects</p>
   <h2 class="headline mw-lg" data-step="0" style="--i:1;margin-top:12px">The same thirty seconds does three different things.</h2>
   <div class="stack gap-m fill" style="margin-top:30px">
@@ -363,9 +389,8 @@ const SLIDES = [
   </div>`,
   notes:`The hinge into the dashboard. A single sentence is not one outcome, it is three, and they pull against each other. <em>Which is why we are about to watch three needles and not one.</em>` },
 
-/* ── 18 ──────────────────────────────────────────────────────────── */
-/* ── 18 · NEW — what the dashboard measures ───────────────────────────────── */
-{ n:'18', rail:0, steps:2, html:`
+/* ── 19 ──────────────────────────────────────────────────────────── */
+{ n:'19', rail:0, steps:2, html:`
   <p class="eyebrow" data-step="0">What the dashboard measures</p>
   <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">Three instruments.</h2>
   <div class="stack gap-l" style="margin-top:38px">
@@ -414,8 +439,8 @@ const SLIDES = [
   </div>`,
   notes:`Twenty seconds. They are about to move these three by hand, so name them now. The point to land: <em>these are not scores. They are three different things a single sentence does at the same time.</em>` },
 
-/* ── 19 ──────────────────────────────────────────────────────────── */
-{ n:'19', rail:0, cls:'dense', steps:3, html:`
+/* ── 20 ──────────────────────────────────────────────────────────── */
+{ n:'20', rail:0, cls:'dense', steps:3, html:`
   <p class="eyebrow" data-step="0">The trade</p>
   <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">No move takes all three up for free.</h2>
   <div class="stack gap-m fill" style="margin-top:22px">
@@ -463,7 +488,7 @@ const SLIDES = [
 
 /* ── 20 ──────────────────────────────────────────────────────────── */
 /* Step 2 is the handoff itself: nothing is revealed, the console takes over. */
-{ n:'20', rail:0, steps:2, center:true, handoffAt:2, html:`
+{ n:'21', rail:0, steps:2, center:true, handoffAt:2, html:`
   <div class="stack gap-l">
     <p class="eyebrow" data-step="0">Now it is your turn</p>
     <div class="stack gap-m">
@@ -475,7 +500,7 @@ const SLIDES = [
   notes:`Advance once more and the console takes over — the screen is already its colour. Read each case, take the room’s answer out loud, register it, move on. Open discussion only where the room splits. <em>Esc brings you back here.</em>` },
 
 /* ── 21 ──────────────────────────────────────────────────────────── */
-{ n:'21', rail:0, steps:3, arriveDark:true, html:`
+{ n:'22', rail:0, steps:3, arriveDark:true, html:`
   <p class="eyebrow" data-step="0">What just happened</p>
   <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">Same facts. Different verdicts.</h2>
   <div class="stack gap-m" style="margin-top:34px">
@@ -489,7 +514,7 @@ const SLIDES = [
   notes:`Point at the cases where the room split. The disagreement is the evidence, not a problem.` },
 
 /* ── 22 ──────────────────────────────────────────────────────────── */
-{ n:'22', rail:0, cls:'dense', steps:2, html:`
+{ n:'23', rail:0, cls:'dense', steps:2, html:`
   <p class="eyebrow" data-step="0">What the three instruments buy</p>
   <h2 class="headline mw-lg" data-step="0" style="--i:1;margin-top:12px">Delegation, cascading, and the time you get back.</h2>
   <div class="stack gap-m" style="margin-top:30px">
@@ -515,7 +540,46 @@ const SLIDES = [
   notes:`This is where the minutes they just spent turn into an argument rather than a complaint. Ask: <em>which of your managers could you hand more to tomorrow, and what would have to be true first?</em>` },
 
 /* ── 23 ──────────────────────────────────────────────────────────── */
-{ n:'23', rail:0, steps:1, center:true, html:`
+{ n:'24', rail:0, cls:'dense', steps:6, html:`
+  <p class="eyebrow" data-step="0">What we take off this call</p>
+  <h2 class="headline" data-step="0" style="--i:1;margin-top:12px">Five things, in order.</h2>
+  <div class="stack gap-m fill" style="margin-top:26px">
+    <div class="recap">
+      <div class="recap__r lift" data-step="1">
+        <span class="recap__n">01</span>
+        <span class="recap__k">Feedback is not automatically good</span>
+        <span class="recap__d">On average it works. One case in three makes it worse.</span>
+      </div>
+      <div class="recap__r lift" data-step="2">
+        <span class="recap__n">02</span>
+        <span class="recap__k">Five places the loop breaks</span>
+        <span class="recap__d">The moment, diagnosis, consequence, audience, outcome.</span>
+      </div>
+      <div class="recap__r lift" data-step="3">
+        <span class="recap__n">03</span>
+        <span class="recap__k">Who and when change what arrives</span>
+        <span class="recap__d">Nodding is not agreement. Month seven is not month one.</span>
+      </div>
+      <div class="recap__r lift" data-step="4">
+        <span class="recap__n">04</span>
+        <span class="recap__k">Three moves, and one habit to drop</span>
+        <span class="recap__d">Stop. Ask. Agree. And stop wrapping it in praise.</span>
+      </div>
+      <div class="recap__r lift" data-step="5">
+        <span class="recap__n">05</span>
+        <span class="recap__k">Three instruments, not one score</span>
+        <span class="recap__d">They move independently. Time wasted is repetition.</span>
+      </div>
+    </div>
+    <div class="stack gap-s push" data-step="6">
+      <div class="rule"></div>
+      <p class="lead accent">None of this asks you to be softer. It asks you to be deliberate for thirty seconds.</p>
+    </div>
+  </div>`,
+  notes:`The slide they photograph. Do not read it out — let them read, and name only the one you most want them to leave with. Then advance once for the close.` },
+
+/* ── 24 ──────────────────────────────────────────────────────────── */
+{ n:'25', rail:0, steps:1, center:true, html:`
   <p class="closing accent mw-lg" data-split="words" data-step="1">Continuous improvement is not a wheel. It is a conversation somebody has to be willing to have.</p>`,
   notes:`Nothing else on the screen and nothing else to say. Let it sit, then stop sharing.` },
 ];
